@@ -42,16 +42,18 @@
     "chapter": 4,
     "section": "核心篇",
     "order": 4,
-    "description": "理解 write_todos 工具和 TodoListMiddleware 如何让 Agent 具备任务规划能力，以及 SummarizationMiddleware 的上下文压缩机制。",
+    "description": "深入 create_deep_agent() 的中间件架构：常驻层、条件层、用户自定义层三层结构，理解 write_todos 任务规划与 TodoListMiddleware 的工作原理。",
     "slides": [
-      { "id": "ch04", "title": "任务规划与中间件" }
+      { "id": "ch04", "title": "Lec 06: 任务规划与中间件", "bilibili": "https://www.bilibili.com/video/BV1mkdwBoEDf/", "xhs": "http://xhslink.com/o/M00gPc2EBF" }
     ],
     "infographics": [
-      { "id": "ch04", "title": "任务规划与中间件" }
+      { "id": "ch04-1", "title": "任务规划与 write_todos" },
+      { "id": "ch04-2", "title": "create_deep_agent 中间件解剖" }
     ],
-    "bilibili": "https://www.bilibili.com/video/BV1zAouBhENj/",
-    "xhs": "http://xhslink.com/o/7P4zwxyjyx",
-    "published": false
+    "bilibili": "https://www.bilibili.com/video/BV1mkdwBoEDf/",
+    "xhs": "http://xhslink.com/o/M00gPc2EBF",
+    "published": true,
+    "pubDate": "2026-05-07"
   },
   "ch05-subagents": {
     "title": "子 Agent 与上下文隔离 — 让 Agent 学会\"委派\"",
