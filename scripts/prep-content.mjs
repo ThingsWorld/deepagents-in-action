@@ -28,7 +28,6 @@ for (const [id, meta] of Object.entries(manifest)) {
   // Rewrite relative image paths to include base path
   const BASE = '/deepagents-course';
   body = body.replace(/!\[([\s\S]*?)\]\(\.\.\/public\/imgs\//g, `![$1](${BASE}/imgs/`);
-  body = body.replace(/!\[([\s\S]*?)\]\(\.\.\/public\/infographic\//g, `![$1](${BASE}/infographic/`);
 
   const frontmatter = [
     '---',
@@ -45,9 +44,6 @@ for (const [id, meta] of Object.entries(manifest)) {
           return slideYaml;
         })]
       : [`slides: []`]),
-    ...(meta.infographics && meta.infographics.length > 0
-      ? [`infographics:`, ...meta.infographics.map(s => `  - id: "${s.id}"\n    title: "${s.title}"`)]
-      : [`infographics: []`]),
     `published: ${meta.published}`,
   ];
 
