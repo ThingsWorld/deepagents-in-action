@@ -30,8 +30,8 @@
 
 基于 [AgentSeek](https://github.com/ob-labs/agentseek) 工程化套件，帮助学员快速搭建开发环境：
 
-- [`agentseek create` 搭建模板应用](https://webup.github.io/deepagents-course/chapters/ch07-agentseek-create/)：拉取预制模板并前后端联调运行
-- [`agentseek skills` 安装开发技能](https://webup.github.io/deepagents-course/chapters/ch08-agentseek-skills/)：为 AI 编码助手加载 LangChain 工程经验
+- [`agentseek create` 搭建模板应用](https://webup.github.io/deepagents-course/chapters/pre01-agentseek-create/)：拉取预制模板并前后端联调运行
+- [`agentseek skills` 安装开发技能](https://webup.github.io/deepagents-course/chapters/pre02-agentseek-skills/)：为 AI 编码助手加载 LangChain 工程经验
 
 ### 认知篇
 
