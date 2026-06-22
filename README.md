@@ -189,6 +189,13 @@ npx skills add ob-labs/agentseek --skill langsmith-trace
 </tr>
 <tr>
 <td align="center" valign="top" width="104">
+  <a href="https://github.com/louieh" title="louieh">
+    <img src="https://avatars.githubusercontent.com/u/7117153?v=4&s=144" width="72" height="72" alt="louieh" style="border-radius:50%;" />
+  </a><br />
+  <a href="https://github.com/louieh" title="打开 louieh 的 GitHub 主页"><kbd><strong>louieh</strong></kbd></a><br />
+  <sub>1 commit</sub>
+</td>
+<td align="center" valign="top" width="104">
   <a href="https://github.com/ThingsWorld" title="ThingsWorld">
     <img src="https://avatars.githubusercontent.com/u/24755216?v=4&s=144" width="72" height="72" alt="ThingsWorld" style="border-radius:50%;" />
   </a><br />
