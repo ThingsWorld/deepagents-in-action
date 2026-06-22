@@ -119,6 +119,112 @@ agentseek create --list-templates
 
 > 所有模板源码托管在 [AgentSeek 主仓库](https://github.com/ob-labs/agentseek) 的 `templates/` 目录下，欢迎提 [Issue](https://github.com/ob-labs/agentseek/issues) 或 PR 贡献新模板。
 
+> ### 国内网络提示
+>
+> 执行以下命令时：
+>
+> ```bash
+> agentseek create --list-templates
+> ```
+>
+> 或创建模板应用时，可能会遇到 GitHub 访问不稳定、连接超时、下载缓慢等问题，例如：
+>
+> ```bash
+> Could not resolve host: github.com
+> Connection timed out
+> Failed to connect to github.com
+> ```
+>
+> 这类问题通常优先排查网络环境，而不是直接判断为 AgentSeek CLI 本身异常。可以先检查当前终端是否能访问 GitHub：
+>
+> ```bash
+> git ls-remote https://github.com/ob-labs/agentseek.git
+> ```
+>
+> 如果访问失败，可以根据实际情况选择下面两种方式处理。
+>
+> #### 方式一：配置代理
+>
+> 如果本地有可用代理，可以在终端中设置代理环境变量。以本地代理端口 `7890` 为例：
+>
+> macOS / Linux
+>
+> ```bash
+> export HTTP_PROXY=http://127.0.0.1:7890
+> export HTTPS_PROXY=http://127.0.0.1:7890
+> ```
+>
+> Windows PowerShell：
+>
+> ```powershell
+> $env:HTTP_PROXY="http://127.0.0.1:7890"
+> $env:HTTPS_PROXY="http://127.0.0.1:7890"
+> ```
+>
+> 其中 `127.0.0.1:7890` 只是示例地址，请根据自己的代理工具实际端口进行替换。
+>
+> 如果 Git 命令仍然无法访问 GitHub，也可以为 Git 单独配置代理：
+>
+> ```bash
+> git config --global http.proxy http://127.0.0.1:7890
+> git config --global https.proxy http://127.0.0.1:7890
+> ```
+>
+> 不再需要 Git 代理时，可以取消配置：
+>
+> ```bash
+> git config --global --unset http.proxy
+> git config --global --unset https.proxy
+> ```
+>
+> #### 方式二：手动下载模板仓库
+>
+> 如果没有可用代理，也可以在网络较好的环境中手动下载 AgentSeek 仓库。
+>
+> 可以使用 Git 克隆：
+>
+> ```bash
+> git clone --depth=1 https://github.com/ob-labs/agentseek.git
+> ```
+>
+> 也可以在 GitHub 页面下载 ZIP 压缩包，解压后得到 `agentseek` 项目目录。
+>
+> 由于 AgentSeek CLI 底层使用 Cookiecutter 创建项目，远程模板仓库可能会缓存到本地的 `~/.cookiecutters` 目录。如果你已经手动下载好了 `agentseek` 仓库，可以尝试将其复制到 Cookiecutter 的默认缓存目录：
+>
+> ```bash
+> mkdir -p ~/.cookiecutters
+> rm -rf ~/.cookiecutters/agentseek
+> cp -R /path/to/agentseek ~/.cookiecutters/agentseek
+> ```
+>
+> 其中 `/path/to/agentseek` 请替换为你本地实际解压或克隆得到的 AgentSeek 仓库路径。
+>
+> 如果你是通过 ZIP 下载的，解压后的目录名可能类似 `agentseek-main`，可以这样复制：
+>
+> ```bash
+> mkdir -p ~/.cookiecutters
+> rm -rf ~/.cookiecutters/agentseek
+> cp -R /path/to/agentseek-main ~/.cookiecutters/agentseek
+> ```
+>
+> Windows PowerShell 可以使用：
+>
+> ```powershell
+> New-Item -ItemType Directory -Force "$env:USERPROFILE\.cookiecutters"
+> Remove-Item -Recurse -Force "$env:USERPROFILE\.cookiecutters\agentseek" -ErrorAction SilentlyContinue
+> Copy-Item -Recurse "C:\path\to\agentseek" "$env:USERPROFILE\.cookiecutters\agentseek"
+> ```
+>
+> 其中 `C:\path\to\agentseek` 请替换为你本地实际解压或克隆得到的 AgentSeek 仓库路径。
+>
+> 复制完成后，可以重新执行：
+>
+> ```bash
+> agentseek create --list-templates
+> ```
+>
+> 如果仍然失败，建议优先检查当前 AgentSeek CLI 版本是否支持从本地缓存读取该模板，或者切换到可访问 GitHub 的网络环境后重新创建。
+
 ### 第二步：创建模板应用
 
 选定模板后，用一条命令创建。我们以 **deepagents/research**（深度研究）为例——这是一个经典的多子 Agent 并行调研场景：
