@@ -141,7 +141,7 @@ agentseek create --list-templates
 > git ls-remote https://github.com/ob-labs/agentseek.git
 > ```
 >
-> 如果访问失败，可以根据实际情况选择下面两种方式处理。
+> 如果访问失败，可以根据实际情况选择下面三种方式处理。
 >
 > #### 方式一：配置代理
 >
@@ -176,52 +176,54 @@ agentseek create --list-templates
 > git config --global --unset http.proxy
 > git config --global --unset https.proxy
 > ```
+> #### 方式二：使用 GitHub 加速代理（推荐）
 >
-> #### 方式二：手动下载模板仓库
+> 无需本地代理，通过公共加速服务拉取模板仓库。以下示例使用 ghproxy.net（已验证可用，也可自行搜索其他加速服务）。
 >
-> 如果没有可用代理，也可以在网络较好的环境中手动下载 AgentSeek 仓库。
+> 克隆到当前目录再复制
 >
-> 可以使用 Git 克隆：
->
-> ```bash
-> git clone --depth=1 https://github.com/ob-labs/agentseek.git
-> ```
->
-> 也可以在 GitHub 页面下载 ZIP 压缩包，解压后得到 `agentseek` 项目目录。
->
-> 由于 AgentSeek CLI 底层使用 Cookiecutter 创建项目，远程模板仓库可能会缓存到本地的 `~/.cookiecutters` 目录。如果你已经手动下载好了 `agentseek` 仓库，可以尝试将其复制到 Cookiecutter 的默认缓存目录：
+> macOS / Linux
 >
 > ```bash
+> git clone --depth 1 https://ghproxy.net/https://github.com/ob-labs/agentseek.git
 > mkdir -p ~/.cookiecutters
 > rm -rf ~/.cookiecutters/agentseek
-> cp -R /path/to/agentseek ~/.cookiecutters/agentseek
+> cp -R ./agentseek ~/.cookiecutters/agentseek
 > ```
 >
-> 其中 `/path/to/agentseek` 请替换为你本地实际解压或克隆得到的 AgentSeek 仓库路径。
+> Windows PowerShell
 >
-> 如果你是通过 ZIP 下载的，解压后的目录名可能类似 `agentseek-main`，可以这样复制：
+> ```powershell
+> git clone --depth 1 https://ghproxy.net/https://github.com/ob-labs/agentseek.git
+> New-Item -ItemType Directory -Force "$env:USERPROFILE\.cookiecutters"
+> Remove-Item -Recurse -Force "$env:USERPROFILE\.cookiecutters\agentseek" -ErrorAction SilentlyContinue
+> Copy-Item -Recurse ".\agentseek" "$env:USERPROFILE\.cookiecutters\agentseek"
+> ```
+>
+> #### 方式三：手动下载模板仓库 (备选)
+> 当加速代理不可用时，可在任意网络良好的环境手动下载 ZIP 压缩包。
+>
+> 1.访问 https://github.com/ob-labs/agentseek 下载 ZIP 。
+>
+> 2.解压后目录通常为 agentseek-main。
+>
+> 3.将其复制到 Cookiecutter 缓存目录：
+>
+> macOS / Linux
 >
 > ```bash
 > mkdir -p ~/.cookiecutters
 > rm -rf ~/.cookiecutters/agentseek
 > cp -R /path/to/agentseek-main ~/.cookiecutters/agentseek
 > ```
->
-> Windows PowerShell 可以使用：
+> Windows PowerShell
 >
 > ```powershell
 > New-Item -ItemType Directory -Force "$env:USERPROFILE\.cookiecutters"
 > Remove-Item -Recurse -Force "$env:USERPROFILE\.cookiecutters\agentseek" -ErrorAction SilentlyContinue
-> Copy-Item -Recurse "C:\path\to\agentseek" "$env:USERPROFILE\.cookiecutters\agentseek"
+> Copy-Item -Recurse "C:\path\to\agentseek-main" "$env:USERPROFILE\.cookiecutters\agentseek"
 > ```
->
-> 其中 `C:\path\to\agentseek` 请替换为你本地实际解压或克隆得到的 AgentSeek 仓库路径。
->
-> 复制完成后，可以重新执行：
->
-> ```bash
-> agentseek create --list-templates
-> ```
+> 请将 /path/to/agentseek-main 或 C:\path\to\agentseek-main 替换为实际解压路径。
 >
 > 如果仍然失败，建议优先检查当前 AgentSeek CLI 版本是否支持从本地缓存读取该模板，或者切换到可访问 GitHub 的网络环境后重新创建。
 
