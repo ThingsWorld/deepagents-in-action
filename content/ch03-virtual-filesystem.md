@@ -28,7 +28,7 @@ Deep Agents 的虚拟文件系统提供了 6 个核心工具：
 | `write_file` | 创建新文件 | 写一份新的备忘录 |
 | `edit_file` | 对已有文件做精确字符串替换 | 用红笔修改文档 |
 | `glob` | 按模式匹配查找文件（如 `**/*.py`） | 在文件柜中按标签找 |
-| `grep` | 搜索文件内容，支持正则、上下文、计数 | 全文检索 |
+| `grep` | 搜索文件内容，按字面量匹配；支持内容输出和计数 | 全文检索 |
 
 ![虚拟文件系统六大工具：ls、read_file、write_file、edit_file、glob、grep](../public/imgs/07-infographic-six-tools.png)
 
@@ -41,7 +41,7 @@ Deep Agents 的虚拟文件系统提供了 6 个核心工具：
 对于大文件，`read_file` 支持按偏移量和行数读取，避免一次性把整个文件塞进上下文：
 
 ```python
-# 读取整个文件（默认前 2000 行）
+# 默认最多读取前 100 行
 read_file("/workspace/report.md")
 
 # 从第 100 行开始，读取 50 行
@@ -73,8 +73,8 @@ read_file("/workspace/report.md", offset=100, limit=50)
 # 找到所有包含 "TODO" 的 Python 文件
 grep("TODO", glob="**/*.py", output_mode="files_with_matches")
 
-# 查看匹配内容及前后 3 行上下文
-grep("def create_agent", output_mode="content", context=3)
+# 查看匹配内容
+grep("def create_agent", output_mode="content")
 ```
 
 ## 上下文自动管理：不只是存文件
