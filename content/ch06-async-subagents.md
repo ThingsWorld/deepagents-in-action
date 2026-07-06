@@ -31,7 +31,7 @@ result = task(name="researcher", task="深入调研 LangGraph 生态")
 | **执行模型** | 阻塞——主 Agent 等到完成才能继续 | 非阻塞——立即返回任务 ID |
 | **并发性** | 可并行触发，但主 Agent 仍被整批阻塞 | 完全并行，主 Agent 全程不阻塞 |
 | **中途追加指令** | ❌ 不支持 | ✅ `update_async_task` 注入新指令 |
-| **取消** | ❌ 不支持 | ✅ `cancel_async_task` 立即终止 |
+| **取消** | ❌ 不支持 | ✅ `cancel_async_task` 请求取消任务 |
 | **状态性** | 无状态——每次调用相互独立 | 有状态——子 Agent 拥有自己的线程，会话历史持续累积 |
 | **典型场景** | 一问一答、毫秒级到秒级的快速委派 | 几分钟以上的研究、编码、迁移等长程任务，需要在对话中互动管理 |
 
@@ -99,7 +99,7 @@ agent = create_deep_agent(
 
 ```
 用户：帮我深入调研一下 LangGraph 多 Agent 架构。
-主 Agent → start_async_task("researcher", "调研 LangGraph 多 Agent 架构")
+主 Agent → start_async_task(description="调研 LangGraph 多 Agent 架构", subagent_type="researcher")
            → 返回 task_id: abc-123
 主 Agent ← 「已经派 researcher 在后台开干，任务 ID：abc-123，
             你可以继续问别的，也可以随时让我查进度。」
