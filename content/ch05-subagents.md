@@ -117,15 +117,22 @@ General-purpose 子 Agent 的作用是**纯粹的上下文隔离**——它和�
 
 ```python
 from deepagents import create_deep_agent
-from deepagents.profiles import GeneralPurposeSubagentProfile, HarnessProfile
+from deepagents.profiles import GeneralPurposeSubagentProfile, HarnessProfile, register_harness_profile
 
 # 两步缺一不可
+# 为指定模型注册 Harness Profile。
+register_harness_profile(
+    key="openai:zai-org/GLM-5.2",
+    profile=HarnessProfile(
+        general_purpose_subagent=GeneralPurposeSubagentProfile(
+            enabled=False
+        )
+    ),
+)
+
 agent = create_deep_agent(
     model=model,
     subagents=[],  # 不传任何同步子 Agent
-    profile=HarnessProfile(
-        general_purpose_subagent=GeneralPurposeSubagentProfile(enabled=False)
-    ),
 )
 ```
 
