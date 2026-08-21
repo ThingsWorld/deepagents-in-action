@@ -8,10 +8,18 @@ const manifest = JSON.parse(
 const indexSource = await readFile(new URL('../src/pages/index.astro', import.meta.url), 'utf8');
 const cardSource = await readFile(new URL('../src/components/ChapterCard.astro', import.meta.url), 'utf8');
 const contentConfigSource = await readFile(new URL('../src/content.config.ts', import.meta.url), 'utf8');
+const chapterLayoutSource = await readFile(
+  new URL('../src/layouts/ChapterLayout.astro', import.meta.url),
+  'utf8',
+);
 const headingSource = await readFile(new URL('../src/components/PreviewSectionHeading.astro', import.meta.url), 'utf8')
   .catch(() => '');
 const chapterExperimentSource = await readFile(
   new URL('../src/data/chapter-experiments.mjs', import.meta.url),
+  'utf8',
+);
+const streamingChapterSource = await readFile(
+  new URL('../content/ch14-streaming.md', import.meta.url),
   'utf8',
 );
 
@@ -25,6 +33,55 @@ test('Chapter 13 publishes its video resource links', () => {
     title: 'Lec 17: Grading Rubrics — 让 Agent 按验收标准自我迭代',
     bilibili: 'https://www.bilibili.com/video/BV1t8bR6GEeU/',
     xhs: 'https://xhslink.cn/o/1JLNjLjjvpn',
+  });
+});
+
+test('Chapter 14 publishes its video resource links', () => {
+  assert.equal(manifest['ch14-streaming'].section, '进阶篇');
+  assert.deepEqual(manifest['ch14-streaming'].slides[0], {
+    id: 'ch14',
+    title: 'Lec 18: Streaming — 实时观察智能体和工具',
+    bilibili: 'https://www.bilibili.com/video/BV1qt8A61ELE/',
+    xhs: 'https://xhslink.cn/o/6uKY9nP8GLk',
+  });
+  assert.match(chapterLayoutSource, /bilibili \|\| xhs \|\| slides\.some/);
+  assert.match(cardSource, /slides && slides\.length > 0 && \(/);
+});
+
+test('Chapter 14 keeps recommended v3 projections separate from v2 protocol streaming', () => {
+  assert.match(streamingChapterSource, /stream_events\(request, version="v3"\)/);
+  assert.match(streamingChapterSource, /stream\.subagents/);
+  assert.match(streamingChapterSource, /stream\.tool_calls/);
+  assert.match(streamingChapterSource, /stream\.interleave/);
+  for (const field of [
+    'name',
+    'path',
+    'status',
+    'messages',
+    'tool_calls',
+    'values',
+    'subagents',
+    'output',
+    'tool_name',
+    'output_deltas',
+    'completed',
+    'error',
+  ]) {
+    assert.match(streamingChapterSource, new RegExp(`\\| \\\`${field}\\\` \\|`));
+  }
+  assert.match(streamingChapterSource, /stream_mode=\["updates", "messages", "custom"\]/);
+  assert.match(streamingChapterSource, /subgraphs=True/);
+  assert.match(streamingChapterSource, /version="v2"/);
+});
+
+test('Chapter 14 points readers to the dedicated streaming template', async () => {
+  const { chapterExperiments } = await import('../src/data/chapter-experiments.mjs');
+
+  assert.deepEqual(chapterExperiments['ch14-streaming'], {
+    template: 'deepagents/streaming',
+    note: '直接运行 Event Streaming v3 模板，观察主 Agent、子 Agent、工具生命周期、状态快照、最终输出和 raw protocol。',
+    command: 'agentseek create deepagents/streaming --checkout main --no-input',
+    source: 'https://github.com/agentseek-ai/agentseek-templates/tree/main/templates/deepagents/streaming',
   });
 });
 
@@ -63,11 +120,12 @@ test('every published numbered chapter maps to exactly one current template comm
     .sort();
 
   assert.deepEqual(Object.keys(chapterExperiments).sort(), publishedNumberedChapters);
-  assert.equal(new Set(Object.keys(chapterExperiments)).size, 13);
+  assert.equal(new Set(Object.keys(chapterExperiments)).size, 14);
   for (const experiment of Object.values(chapterExperiments)) {
     assert.match(experiment.command, /^agentseek create \S+ --checkout main --no-input$/);
     assert.match(experiment.source, /^https:\/\/github\.com\/agentseek-ai\/agentseek-templates\/tree\/main\/templates\//);
   }
   assert.match(chapterExperimentSource, /deepagents\/content-builder/);
   assert.match(chapterExperimentSource, /langchain\/rubric/);
+  assert.match(chapterExperimentSource, /ch14-streaming/);
 });
