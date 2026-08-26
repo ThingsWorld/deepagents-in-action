@@ -24,16 +24,21 @@ const streamingChapterSource = await readFile(
 );
 const readmeSource = await readFile(new URL('../README.md', import.meta.url), 'utf8');
 
-test('Chapters 13 and 14 share the preview-feature row', () => {
+test('Chapters 13 through 15 share the preview-feature row', () => {
   assert.equal(manifest['ch13-grading-rubrics'].section, '前沿预览');
   assert.equal(manifest['ch14-streaming'].section, '前沿预览');
+  assert.equal(manifest['ch15-interpreters'].section, '前沿预览');
   assert.equal(
     manifest['ch14-streaming'].order,
     manifest['ch13-grading-rubrics'].order + 1,
   );
+  assert.equal(
+    manifest['ch15-interpreters'].order,
+    manifest['ch14-streaming'].order + 1,
+  );
 });
 
-test('README places Chapters 13 and 14 together in the preview section', () => {
+test('README places Chapters 13 through 15 together in the preview section', () => {
   let currentSection = '';
   const chapters = [];
 
@@ -49,9 +54,10 @@ test('README places Chapters 13 and 14 together in the preview section', () => {
 
   assert.deepEqual(
     chapters.filter(({ section }) => section === '前沿预览').map(({ chapter }) => chapter),
-    [13, 14],
+    [13, 14, 15],
   );
   assert.equal(chapters.filter(({ chapter }) => chapter === 14).length, 1);
+  assert.equal(chapters.filter(({ chapter }) => chapter === 15).length, 1);
 });
 
 test('Chapter 13 publishes its video resource links', () => {
@@ -72,6 +78,15 @@ test('Chapter 14 publishes its video resource links', () => {
   });
   assert.match(chapterLayoutSource, /bilibili \|\| xhs \|\| slides\.some/);
   assert.match(cardSource, /slides && slides\.length > 0 && \(/);
+});
+
+test('Chapter 15 publishes its video resource links', () => {
+  assert.deepEqual(manifest['ch15-interpreters'].slides[0], {
+    id: 'ch15',
+    title: 'Lec 19: Interpreters — 让 Agent 用代码编排工具与数据',
+    bilibili: 'https://www.bilibili.com/video/BV1DAh36fEWJ/',
+    xhs: 'https://xhslink.cn/o/7nkz9WmQ00W',
+  });
 });
 
 test('Chapter 14 keeps recommended v3 projections separate from v2 protocol streaming', () => {
@@ -109,6 +124,16 @@ test('Chapter 14 points readers to the dedicated streaming template', async () =
     command: 'agentseek create deepagents/streaming --checkout main --no-input',
     source: 'https://github.com/agentseek-ai/agentseek-templates/tree/main/templates/deepagents/streaming',
   });
+});
+
+test('Chapter 15 publishes its PDF without invented experiment metadata', async () => {
+  const chapter = manifest['ch15-interpreters'];
+  const { chapterExperiments } = await import('../src/data/chapter-experiments.mjs');
+
+  assert.equal(chapter.chapter, 15);
+  assert.equal(chapter.section, '前沿预览');
+  assert.equal(chapter.published, true);
+  assert.equal(chapterExperiments['ch15-interpreters'], undefined);
 });
 
 test('content schema accepts the preview-feature section', () => {
@@ -150,16 +175,14 @@ test('homepage experiment descriptions stay concise', async () => {
   }
 });
 
-test('every published numbered chapter maps to exactly one current template command', async () => {
+test('every declared chapter experiment targets a published numbered chapter', async () => {
   const { chapterExperiments } = await import('../src/data/chapter-experiments.mjs');
-  const publishedNumberedChapters = Object.entries(manifest)
+  const publishedNumberedChapters = new Set(Object.entries(manifest)
     .filter(([id, chapter]) => id.startsWith('ch') && chapter.published)
-    .map(([id]) => id)
-    .sort();
+    .map(([id]) => id));
 
-  assert.deepEqual(Object.keys(chapterExperiments).sort(), publishedNumberedChapters);
-  assert.equal(new Set(Object.keys(chapterExperiments)).size, 14);
-  for (const experiment of Object.values(chapterExperiments)) {
+  for (const [chapterId, experiment] of Object.entries(chapterExperiments)) {
+    assert.equal(publishedNumberedChapters.has(chapterId), true);
     assert.match(experiment.command, /^agentseek create \S+ --checkout main --no-input$/);
     assert.match(experiment.source, /^https:\/\/github\.com\/agentseek-ai\/agentseek-templates\/tree\/main\/templates\//);
   }
