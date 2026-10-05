@@ -2,6 +2,8 @@
 
 > 上一章我们学习了任务规划。但有些子任务非常复杂，需要大量工具调用和中间处理——如果全在主 Agent 里完成，上下文很快就会爆炸。本章学习 Deep Agents 的另一个核心能力：子 Agent（Subagent），让主 Agent 学会"委派"。
 
+配套实验：[第 5 章 Notebook：子 Agent 委派与上下文隔离](https://github.com/datawhalechina/deepagents-in-action/blob/main/notebooks/ch05/01-subagent-delegation.ipynb)。
+
 ## 为什么需要子 Agent？
 
 ### 上下文膨胀问题
@@ -22,7 +24,7 @@
 工作方式很简单：
 
 1. 主 Agent 通过 `task` 工具**创建**一个子 Agent
-2. 子 Agent 在**独立的上下文**中执行任务（自己的工具调用、文件操作都不会回到主 Agent）
+2. 子 Agent 在**独立的上下文**中执行任务（中间调用记录不进入主 Agent 对话；共用 Backend 时，文件仍可共享）
 3. 子 Agent 完成后，只把**最终结果**返回给主 Agent
 4. 主 Agent 的上下文保持干净
 
@@ -39,7 +41,7 @@
 | 需要不同模型能力的任务 | ✅ | 子 Agent 可以用不同的模型 |
 | 需要高层协调的复杂任务 | ✅ | 主 Agent 专注协调，子 Agent 专注执行 |
 | 单步简单查询 | ❌ | 委派开销大于收益 |
-| 需要保留中间上下文的任务 | ❌ | 子 Agent 的上下文不回传给主 Agent |
+| 需要主 Agent 看到子 Agent 的完整调用过程 | ❌ | 主 Agent 只收到最终结果 |
 
 ## 定义子 Agent：字典方式
 
@@ -108,7 +110,7 @@ agent = create_deep_agent(
 )
 
 # 主 Agent 可以这样委派：
-# task(name="general-purpose", task="搜索量子计算的最新进展")
+# task(subagent_type="general-purpose", description="搜索量子计算的最新进展")
 ```
 
 General-purpose 子 Agent 的作用是**纯粹的上下文隔离**——它和主 Agent 有相同的能力，但在独立的上下文中工作。主 Agent 不需要承受子任务中 10 次搜索带来的上下文膨胀，只需要收到一份精炼的摘要。
@@ -264,9 +266,9 @@ agent = create_deep_agent(
 执行流程：
 
 1. 主 Agent 使用显式启用的 `write_todos` 制定计划
-2. `task(name="data-collector", task="搜索 AI Agent 领域的最新趋势")` → 返回数据摘要
-3. `task(name="data-analyzer", task="分析以下数据...")` → 返回关键发现
-4. `task(name="report-writer", task="根据以下发现撰写报告...")` → 返回报告
+2. `task(subagent_type="data-collector", description="搜索 AI Agent 领域的最新趋势")` → 返回数据摘要
+3. `task(subagent_type="data-analyzer", description="分析以下数据...")` → 返回关键发现
+4. `task(subagent_type="report-writer", description="根据以下发现撰写报告...")` → 返回报告
 5. 主 Agent 整合输出
 
 每一步的子 Agent 都在独立上下文中工作，主 Agent 只看到精炼的返回结果。

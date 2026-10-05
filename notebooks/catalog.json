@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "notebooks": [
+    {
+      "id": "template",
+      "kind": "template",
+      "chapter_id": null,
+      "title": "最小工具调用模板",
+      "path": "_template/01-minimal-tool.ipynb",
+      "dependencies": [],
+      "model": "optional",
+      "services": []
+    },
+    {
+      "id": "ch01-agent-harness",
+      "chapter_id": "ch01-agent-harness",
+      "title": "Agent Harness 与最小运行结构",
+      "path": "ch01/01-agent-harness.ipynb",
+      "dependencies": [],
+      "model": "optional",
+      "services": [],
+      "source_issue": 116
+    },
+    {
+      "id": "ch05-subagents",
+      "chapter_id": "ch05-subagents",
+      "title": "子 Agent 委派与上下文隔离",
+      "path": "ch05/01-subagent-delegation.ipynb",
+      "dependencies": [],
+      "model": "optional",
+      "services": [],
+      "source_issue": 126
+    },
+    {
+      "id": "ch06-async-subagents",
+      "chapter_id": "ch06-async-subagents",
+      "title": "异步子 Agent 生命周期",
+      "path": "ch06/01-async-subagent-lifecycle.ipynb",
+      "dependencies": [
+        "server"
+      ],
+      "model": "optional",
+      "services": [
+        "local-agent-server"
+      ],
+      "source_issue": 128
+    }
+  ]
+}

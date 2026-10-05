@@ -15,3 +15,13 @@ node_modules/
 
 # local planning docs (superpowers)
 docs/superpowers/
+
+# Notebook environments, credentials and generated execution artifacts
+.venv/
+.env
+.ipynb_checkpoints/
+__pycache__/
+.pytest_cache/
+.langgraph_api/
+artifacts/notebooks/
+artifacts/notebooks-*/

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "deepagents-course-notebooks"
+version = "0.1.0"
+description = "Reproducible mechanism experiments for Deep Agents in Action"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "deepagents==0.7.15", "langchain==1.4.2", "langgraph==1.2.11",
+  "langchain-openai==1.6.2", "python-dotenv>=1,<2",
+  "ipykernel>=6,<8", "nbclient>=0.10,<0.11", "nbconvert==7.17.1",
+  "nbformat>=5.10,<6",
+]
+
+[project.optional-dependencies]
+server = [
+  "langgraph-cli[inmem]==0.4.32", "langgraph-sdk==0.4.5",
+  "langgraph-api==0.15.1", "langgraph-runtime-inmem==0.35.1",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/course_notebooks"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
