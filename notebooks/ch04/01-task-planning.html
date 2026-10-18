@@ -7796,14 +7796,269 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=course-run-info">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<blockquote>
+<p>本次执行模式：<strong>offline</strong>。源码指纹：<code>e0dff3975113</code>。</p>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ch04-introduction">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="%E7%AC%AC-4-%E7%AB%A0%EF%BC%9A%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92%E4%B8%8E%E5%88%86%E8%A7%A3">第 4 章：任务规划与分解<a class="anchor-link" href="#%E7%AC%AC-4-%E7%AB%A0%EF%BC%9A%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92%E4%B8%8E%E5%88%86%E8%A7%A3">¶</a></h1><p>本实验将逐步学习 <code>TodoListMiddleware</code>、<code>write_todos</code> 和 <code>todos</code> 状态。</p>
-<p>后续添加实验步骤、代码与结果检查。</p>
+<h1 id="%E7%AC%AC-4-%E7%AB%A0-Notebook%EF%BC%9A%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92%E4%B8%8E%E5%88%86%E8%A7%A3">第 4 章 Notebook：任务规划与分解<a class="anchor-link" href="#%E7%AC%AC-4-%E7%AB%A0-Notebook%EF%BC%9A%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92%E4%B8%8E%E5%88%86%E8%A7%A3">¶</a></h1><p>本 Notebook 配套课程<a href="../../content/ch04-task-planning.md">第 4 章：任务规划与分解</a>，通过实验理解 <code>TodoListMiddleware</code>、<code>write_todos</code> 和 <code>todos</code> 状态之间的关系。</p>
+<p>第 2 章研究助手帮助我们观察 Todo 列表和文件状态，本章进一步关注计划如何更新，以及如何根据实际产物判断任务是否完成。</p>
+<p>你只需基础 Python。所有变量都从第一格建立，可以单独运行，无需先执行其他章节。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ch04-goals">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87">学习目标<a class="anchor-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87">¶</a></h2><p>跑完本 Notebook 后，你应该能够：</p>
+<ol>
+<li>显式启用 <code>TodoListMiddleware()</code>，对比未启用与启用时的工具和状态结构；</li>
+<li>用多步骤研究任务观察计划制定、搜索、进度更新和结果检查；</li>
+<li>查看 <code>write_todos</code> 的调用参数、工具结果和 <code>todos</code> 状态，说明新列表如何替换旧计划；</li>
+<li>解释 <code>pending</code>（待办）、<code>in_progress</code>（进行中）、<code>completed</code>（已完成）的含义，以及何时需要调整计划；</li>
+<li>根据实际搜索结果或报告核查产物，区分模型声明完成与任务确实完成；</li>
+<li>理解模型可能不调用 <code>write_todos</code>，对稳定的结构和行为做检查，不强制固定计划内容或完整状态流转。</li>
+</ol>
+<p><strong>当前范围</strong>：已实现第 1 项，其余实验后续逐步添加。</p>
+<p><strong>预期现象</strong>（offline）：未启用时，<code>write_todos</code> 未注册、<code>todos</code> 字段未声明；显式启用后，两项均存在，检查格打印“检查通过”。本阶段不执行任务，不产生实际计划或报告。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ch04-environment">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E4%B8%8E%E8%BF%90%E8%A1%8C%E6%A8%A1%E5%BC%8F">运行环境与运行模式<a class="anchor-link" href="#%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E4%B8%8E%E8%BF%90%E8%A1%8C%E6%A8%A1%E5%BC%8F">¶</a></h2><p>使用课程锁定的 Python 3.12 环境，安装与内核选择见 <a href="../README.md">Notebook 索引</a>。默认 offline 模式在仓库根目录执行：</p>
+<div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--project<span class="w"> </span>notebooks<span class="w"> </span>--locked
+uv<span class="w"> </span>run<span class="w"> </span>--project<span class="w"> </span>notebooks<span class="w"> </span>--locked<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>course_notebooks.run<span class="w"> </span>ch04-task-planning
+</pre></div>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>模型</th>
+<th>工具执行</th>
+<th>需要的 Key 与依赖</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>offline（默认，随附输出）</td>
+<td>脚本模型，仅用于组装 Agent，不执行预设回复</td>
+<td>只检查工具注册与状态结构，不执行工具</td>
+<td>无 Key；使用课程基础依赖</td>
+</tr>
+<tr>
+<td>live（尚未接入）</td>
+<td>当前对照实验仍使用脚本模型</td>
+<td>尚无真实模型驱动的工具调用</td>
+<td>当前实验无需配置；后续按实际实验补充</td>
+</tr>
+</tbody>
+</table>
+<p>当前实验无需联网。它验证规划能力是否已配置，不证明模型会使用规划工具，也不验证任务完成情况。下一格打印运行模式、Python 和核心依赖版本，便于核对环境。</p>
+<h3 id="%E7%A1%85%E6%B5%81%E7%9C%9F%E5%AE%9E%E6%A8%A1%E5%9E%8B%EF%BC%88live%EF%BC%89">硅流真实模型（live）<a class="anchor-link" href="#%E7%A1%85%E6%B5%81%E7%9C%9F%E5%AE%9E%E6%A8%A1%E5%9E%8B%EF%BC%88live%EF%BC%89">¶</a></h3><p><strong>待验证</strong>：当前版本尚无整本 live 通过记录，暂不列出已验证型号。</p>
+<p>配置：真实模型统一在未提交的根目录 <code>.env</code> 中填写 <code>SILICONFLOW_API_KEY</code> 和完整 <code>MODEL_NAME</code>；公共入口不提供隐含模型默认值。API 地址、固定参数与报告字段见 <a href="../README.md#live-records">README 模型记录说明</a>。随附输出仍为 offline。</p>
+<p>范围与服务：当前仅完成配置对照，直接使用 <code>ScriptedChatModel</code>，尚未通过 <code>create_model()</code> 接入真实模型；添加 <code>--mode live</code> 不会使本节调用真实模型。暂用默认 offline，后续加入实际执行流程时再补充 live 命令、服务要求和验证记录。</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ch04-runtime">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">course_notebooks.nbtools</span><span class="w"> </span><span class="kn">import</span> <span class="n">show_runtime</span>
+
+<span class="n">show_runtime</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>运行模式： offline （脚本模型）
+Python： 3.12.15 平台： Linux x86_64
+deepagents==0.7.22
+langchain==1.4.3
+langchain-core==1.6.6
+langgraph==1.2.13
+langchain-openai==1.6.7
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ch04-middleware-explanation">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="1.-%E6%98%BE%E5%BC%8F%E5%90%AF%E7%94%A8-TodoListMiddleware">1. 显式启用 TodoListMiddleware<a class="anchor-link" href="#1.-%E6%98%BE%E5%BC%8F%E5%90%AF%E7%94%A8-TodoListMiddleware">¶</a></h2><p><strong>中间件</strong>是插入 Agent 运行过程的扩展。课程当前 v0.7 默认不安装任务规划中间件，需要时显式传入
+<code>middleware=[TodoListMiddleware()]</code>。</p>
+<p>两个 Agent 分别使用独立的离线模型，只比较是否添加中间件。<code>create_deep_agent()</code> 组装运行图，
+此时不会执行任务；<code>AIMessage</code> 表示模型回复，这里的文字只是未使用的占位响应。</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ch04-imports">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">deepagents</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_deep_agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.agents.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">TodoListMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">AIMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course_notebooks.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScriptedChatModel</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ch04-build-agents">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">plain_agent</span> <span class="o">=</span> <span class="n">create_deep_agent</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">ScriptedChatModel</span><span class="p">(</span><span class="n">responses</span><span class="o">=</span><span class="p">[</span><span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s2">"未执行"</span><span class="p">)]),</span>
+<span class="p">)</span>
+
+<span class="n">planning_agent</span> <span class="o">=</span> <span class="n">create_deep_agent</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">ScriptedChatModel</span><span class="p">(</span><span class="n">responses</span><span class="o">=</span><span class="p">[</span><span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s2">"未执行"</span><span class="p">)]),</span>
+    <span class="n">middleware</span><span class="o">=</span><span class="p">[</span><span class="n">TodoListMiddleware</span><span class="p">()],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ch04-inspection-explanation">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="2.-%E6%A3%80%E6%9F%A5%E5%B7%A5%E5%85%B7%E5%92%8C%E7%8A%B6%E6%80%81%E7%BB%93%E6%9E%84">2. 检查工具和状态结构<a class="anchor-link" href="#2.-%E6%A3%80%E6%9F%A5%E5%B7%A5%E5%85%B7%E5%92%8C%E7%8A%B6%E6%80%81%E7%BB%93%E6%9E%84">¶</a></h2><p><code>write_todos</code> 是模型可以请求调用的工具，<code>todos</code> 是保存任务列表的状态字段。
+下一格分别检查它们是否出现在工具注册表和输出状态的 Schema 中。
+<strong>Schema</strong> 描述状态允许包含哪些字段，不是本次任务已经产生的状态值。</p>
+<p><code>agent.nodes["tools"].bound.tools_by_name</code> 是课程锁定版本中的内部工具注册表，仅用于本实验观察；
+<code>get_output_jsonschema()</code> 返回输出状态的结构说明。<code>in</code> 判断名称是否存在，<code>assert</code> 在条件不成立时停止执行。</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ch04-check-support">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">has_todo_support</span><span class="p">(</span><span class="n">agent</span><span class="p">):</span>
+    <span class="n">tools</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="s2">"tools"</span><span class="p">]</span><span class="o">.</span><span class="n">bound</span><span class="o">.</span><span class="n">tools_by_name</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_output_jsonschema</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"properties"</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="k">return</span> <span class="s2">"write_todos"</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">,</span> <span class="s2">"todos"</span> <span class="ow">in</span> <span class="n">fields</span>
+
+
+<span class="n">plain_support</span> <span class="o">=</span> <span class="n">has_todo_support</span><span class="p">(</span><span class="n">plain_agent</span><span class="p">)</span>
+<span class="n">planning_support</span> <span class="o">=</span> <span class="n">has_todo_support</span><span class="p">(</span><span class="n">planning_agent</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"未启用：write_todos 已注册 ="</span><span class="p">,</span> <span class="n">plain_support</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"；todos 字段已声明 ="</span><span class="p">,</span> <span class="n">plain_support</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"已启用：write_todos 已注册 ="</span><span class="p">,</span> <span class="n">planning_support</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"；todos 字段已声明 ="</span><span class="p">,</span> <span class="n">planning_support</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="k">assert</span> <span class="n">plain_support</span> <span class="o">==</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span> <span class="s2">"未启用时不应包含 Todo 工具和状态字段"</span>
+<span class="k">assert</span> <span class="n">planning_support</span> <span class="o">==</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="s2">"请检查是否显式传入 TodoListMiddleware()"</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"检查通过：规划中间件提供了 Todo 工具和状态结构。"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>未启用：write_todos 已注册 = False ；todos 字段已声明 = False
+已启用：write_todos 已注册 = True ；todos 字段已声明 = True
+检查通过：规划中间件提供了 Todo 工具和状态结构。
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ch04-interpretation">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E7%BB%93%E6%9E%9C%EF%BC%9F">如何理解结果？<a class="anchor-link" href="#%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E7%BB%93%E6%9E%9C%EF%BC%9F">¶</a></h3><table>
+<thead>
+<tr>
+<th>配置</th>
+<th>规划能力的区别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>未启用</td>
+<td>模型仍可用文字拆解任务、连续调用其他工具，但没有这套内置的 Todo 工具与状态记录机制</td>
+</tr>
+<tr>
+<td>显式启用</td>
+<td>增加规划提示词、<code>write_todos</code> 工具和 <code>todos</code> 状态字段，模型可选择用它们记录和更新计划</td>
+</tr>
+</tbody>
+</table>
+<p>应看到未启用一行为 <code>False / False</code>，已启用一行为 <code>True / True</code>。
+这证明能力已配置，不证明模型已经规划。模型可能不调用 <code>write_todos</code>；中间件也不会自动执行待办或核验任务产物。
+本节没有调用 <code>invoke()</code>，因此没有实际计划、工具执行记录或任务结果。</p>
+<p>本节没有创建文件或后台服务，重启内核即可清理变量。
+后续再添加 <code>write_todos</code> 的实际调用、状态含义和产物核查。</p>
 </div>
 </div>
 </div>
