@@ -19,13 +19,13 @@ from jupyter_client.kernelspec import KernelSpecManager
 from nbclient import NotebookClient
 from nbconvert import HTMLExporter, MarkdownExporter
 
-from .model_config import repository_root, selected_mode
+from .model_config import model_configuration, repository_root, selected_mode
 
 LINK = re.compile(r"!?\[[^\]]*\]\(([^\s)]+)\)")
 
 
 def validate_catalog(root, entries):
-    chapters = json.loads((root / "scripts/chapters.json").read_text())
+    chapters = json.loads((root / "scripts/chapters.json").read_text(encoding="utf-8"))
     seen = set()
     for entry in entries:
         if entry["id"] in seen or not re.fullmatch(r"[a-z0-9-]+", entry["id"]):
@@ -85,10 +85,19 @@ def stage_chapter(root, path, stage):
         shutil.copy2(chapter, stage / "content" / chapter.name)
 
 
+def _markdown_indent(text):
+    # nbconvert uses os.linesep here, but notebook output is LF on every platform.
+    # Remove only the prefix added after a final newline, preserving source spaces.
+    indented = re.sub(r"^", "    ", text, flags=re.MULTILINE)
+    return indented[:-4] if indented.endswith("\n    ") else indented
+
+
 def export_reading(nb, path, root, output_dir, notebook_id, commit, *, relative_links=False):
     reading = nbformat.reads(nbformat.writes(nb), as_version=4)
+    config = nb.metadata.course_run.get("model_configuration")
+    model_note = f" 模型配置：`{config['model_name']}`（{config['provider']}，{config['api_host']}）。" if config else ""
     reading.cells.insert(0, nbformat.v4.new_markdown_cell(
-        f"> 本次执行模式：**{nb.metadata.course_run.mode}**。源码指纹：`{nb.metadata.course_run.source_hash[:12]}`。",
+        f"> 本次执行模式：**{nb.metadata.course_run.mode}**。{model_note}源码指纹：`{nb.metadata.course_run.source_hash[:12]}`。",
         id="course-run-info",
     ))
     # Exported artifacts are outside the source tree: link back to exact source paths.
@@ -109,13 +118,21 @@ def export_reading(nb, path, root, output_dir, notebook_id, commit, *, relative_
                 end = match.end(1) - match.start(0)
                 return match.group(0)[:start] + link + match.group(0)[end:]
             cell.source = LINK.sub(resolve, cell.source)
-    for extension, exporter in (("html", HTMLExporter()), ("md", MarkdownExporter())):
+    markdown = MarkdownExporter()
+    markdown.register_filter("indent", _markdown_indent)
+    for extension, exporter in (("html", HTMLExporter()), ("md", markdown)):
         body, resources = exporter.from_notebook_node(reading, resources={"unique_key": notebook_id})
-        (output_dir / f"{notebook_id}.{extension}").write_text(body)
+        (output_dir / f"{notebook_id}.{extension}").write_text(body, encoding="utf-8", newline="\n")
         for filename, data in resources.get("outputs", {}).items():
             asset = output_dir / filename
             asset.parent.mkdir(parents=True, exist_ok=True)
             asset.write_bytes(data)
+
+
+def _reading_bytes(path):
+    data = path.read_bytes()
+    # Git may check text out with CRLF. Images and other assets stay byte-exact.
+    return data.replace(b"\r\n", b"\n") if path.suffix in {".html", ".md"} else data
 
 
 def validate_reading(root, entries):
@@ -132,7 +149,7 @@ def validate_reading(root, entries):
             for generated in expected.rglob("*"):
                 if generated.is_file():
                     saved = path.parent / generated.relative_to(expected)
-                    if not saved.is_file() or saved.read_bytes() != generated.read_bytes():
+                    if not saved.is_file() or _reading_bytes(saved) != _reading_bytes(generated):
                         raise ValueError(f"Missing or stale reading copy: {saved}; rerun with --write-back")
 
 
@@ -149,6 +166,9 @@ def execute_one(entry, root, output_dir, *, mode, timeout, write_back=False):
               "services": entry.get("services", []), "model_evidence": "scripted" if mode == "offline" else "provider"}
     env = kernel_environment(root, mode)
     try:
+        config = model_configuration(root=root, mode=mode, environ=env)
+        result["model_configuration"] = config
+        nb.metadata.course_run["model_configuration"] = config
         with tempfile.TemporaryDirectory(prefix="course-notebook-") as directory:
             temporary = Path(directory)
             stage = temporary / "repository"
@@ -157,7 +177,7 @@ def execute_one(entry, root, output_dir, *, mode, timeout, write_back=False):
             kernels = temporary / "kernels"
             spec = kernels / "course"
             spec.mkdir(parents=True)
-            (spec / "kernel.json").write_text(json.dumps({"argv": [sys.executable, "-m", "ipykernel_launcher", "-f", "{connection_file}"], "display_name": "Course project Python", "language": "python"}))
+            (spec / "kernel.json").write_text(json.dumps({"argv": [sys.executable, "-m", "ipykernel_launcher", "-f", "{connection_file}"], "display_name": "Course project Python", "language": "python"}), encoding="utf-8")
             env["COURSE_REPO_ROOT"] = str(stage)
             env["IPYTHONDIR"] = str(temporary / "ipython")
             env["JUPYTER_RUNTIME_DIR"] = str(temporary / "runtime")
@@ -168,9 +188,11 @@ def execute_one(entry, root, output_dir, *, mode, timeout, write_back=False):
     except Exception as error:
         result.update(status="failed", error=type(error).__name__)
     # Never export credentials accidentally printed by a cell.
-    rendered = json.dumps([c.get("outputs", []) for c in nb.cells])
+    rendered = json.dumps({"outputs": [c.get("outputs", []) for c in nb.cells],
+                           "course_run": nb.metadata.course_run, "result": result})
     secrets = [v for k, v in env.items() if (k.endswith("API_KEY") or k.endswith("TOKEN")) and len(v) >= 8]
     if any(value in rendered for value in secrets):
+        result.pop("model_configuration", None)
         result.update(status="failed", error="Credential detected in output; artifacts withheld")
         return result
     nb.metadata.course_run["status"] = result["status"]
@@ -195,10 +217,10 @@ def run_entries(entries, root, output_dir, *, mode, timeout=180, write_back=Fals
               "lock_hash": hashlib.sha256((root / "notebooks/uv.lock").read_bytes()).hexdigest() if (root / "notebooks/uv.lock").exists() else None,
               "results": [{"id": e["id"], "status": "not_run"} for e in entries]}
     report_path = output_dir / "report.json"
-    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     for index, entry in enumerate(entries):
         report["results"][index] = execute_one(entry, root, output_dir, mode=mode, timeout=timeout, write_back=write_back)
-        report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+        report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         if report["results"][index]["status"] == "failed":
             break
     return report
@@ -215,7 +237,7 @@ def main(argv=None):
     parser.add_argument("--timeout", type=int, default=180)
     args = parser.parse_args(argv)
     root = repository_root()
-    catalog = json.loads((root / "notebooks/catalog.json").read_text())
+    catalog = json.loads((root / "notebooks/catalog.json").read_text(encoding="utf-8"))
     entries = catalog["notebooks"]
     try:
         validate_catalog(root, entries)

@@ -1,4 +1,4 @@
-> 本次执行模式：**offline**。源码指纹：`366833ffcce5`。
+> 本次执行模式：**offline**。源码指纹：`be168a72dc9d`。
 
 # 第 1 章 Notebook：Agent Harness 与最小运行结构
 
@@ -45,7 +45,15 @@ uv sync --project notebooks --locked
 uv run --project notebooks --locked python -m course_notebooks.run ch01-agent-harness
 ```
 
-核心依赖：deepagents 0.7.15、langchain 1.4.2、langgraph 1.2.11、langchain-openai 1.6.2；完整依赖由 uv.lock 锁定。下方输出记录本次实际环境。
+核心依赖：deepagents 0.7.22、langchain 1.4.3、langchain-core 1.6.6、langgraph 1.2.13、langchain-openai 1.6.7；完整依赖由 uv.lock 锁定。下方输出记录本次实际环境。
+
+### 硅流真实模型（live）
+
+**待验证**（2026-10-06 核对）：当前版本尚无整本 live 通过记录，暂不列出已验证型号。先用 offline 学习；补验后再填写完整型号、日期、验证版本和记录链接。
+
+配置：在未提交的根目录 `.env` 中填写 `SILICONFLOW_API_KEY` 和完整 `MODEL_NAME`；公共入口不提供隐含模型默认值。API 地址、固定参数与报告字段见 [README 模型记录说明](../README.md#live-records)。随附输出仍为 offline。
+
+范围与服务：普通 Agent 与 Deep Agent 的正常工具选择使用真实模型；工具在本地执行，无额外服务。
 
 ## 预期现象与运行模式
 
@@ -67,11 +75,12 @@ show_runtime()
 ```
 
     运行模式： offline （脚本模型）
-    Python： 3.12.13 平台： Darwin arm64
-    deepagents==0.7.15
-    langchain==1.4.2
-    langgraph==1.2.11
-    langchain-openai==1.6.2
+    Python： 3.12.11 平台： Darwin arm64
+    deepagents==0.7.22
+    langchain==1.4.3
+    langchain-core==1.6.6
+    langgraph==1.2.13
+    langchain-openai==1.6.7
 
 
 ## 1. 初始化模型：先控制选择，再观察执行

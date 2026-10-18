@@ -1,4 +1,4 @@
-> 本次执行模式：**offline**。源码指纹：`a14c406605a2`。
+> 本次执行模式：**offline**。源码指纹：`dad84428d5c2`。
 
 # 第 5 章 Notebook：子 Agent 委派与上下文隔离
 
@@ -55,6 +55,14 @@ uv run --project notebooks --locked python -m course_notebooks.run ch05-subagent
 
 要观察真实模型选择工具，按 README 配置模型并在命令后添加 `--mode live`；需要网络且可能产生费用。除模型 API 外，本章不需要搜索、数据库或沙箱。
 
+### 硅流真实模型（live）
+
+**待验证**（2026-10-06 核对）：当前版本尚无整本 live 通过记录，暂不列出已验证型号。先用 offline 学习；补验后再填写完整型号、日期、验证版本和记录链接。
+
+配置：在未提交的根目录 `.env` 中填写 `SILICONFLOW_API_KEY` 和完整 `MODEL_NAME`；公共入口不提供隐含模型默认值。API 地址、固定参数与报告字段见 [README 模型记录说明](../README.md#live-records)。随附输出仍为 offline。
+
+范围与服务：主、子 Agent 使用真实模型；研究资料为本地固定样例，不调用搜索服务。
+
 ## 0. 确认环境并导入辅助函数
 
 `show_runtime()` 打印运行模式与版本，`show_text()` 让长输出分行。它们来自课程辅助包。`HumanMessage` 是用户输入，`AIMessage` 是模型回复或工具请求，`ToolMessage` 是工具返回。
@@ -72,11 +80,12 @@ show_runtime()
 ```
 
     运行模式： offline （脚本模型）
-    Python： 3.12.13 平台： Darwin arm64
-    deepagents==0.7.15
-    langchain==1.4.2
-    langgraph==1.2.11
-    langchain-openai==1.6.2
+    Python： 3.12.11 平台： Darwin arm64
+    deepagents==0.7.22
+    langchain==1.4.3
+    langchain-core==1.6.6
+    langgraph==1.2.13
+    langchain-openai==1.6.7
 
 
 ## 1. 定义可复现的本地资料工具

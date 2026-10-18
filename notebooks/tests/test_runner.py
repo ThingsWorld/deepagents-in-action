@@ -1,11 +1,13 @@
 import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 
 import nbformat
 import pytest
 
-from course_notebooks.run import export_reading, run_entries, validate_catalog
+from course_notebooks.run import export_reading, run_entries, source_hash, validate_catalog, validate_reading
 
 
 def make_repo(tmp_path, sources):
@@ -21,6 +23,38 @@ def make_repo(tmp_path, sources):
                         "title": name, "dependencies": [], "services": [], "model": "optional"})
     (tmp_path / "notebooks/catalog.json").write_text(json.dumps({"schema_version": 1, "notebooks": entries}))
     return entries
+
+
+@pytest.mark.parametrize("export", [False, True])
+def test_cli_preserves_unicode_without_utf8_mode(tmp_path, export):
+    entries = make_repo(tmp_path, {"ok": "print('研究完成 🐳')"})
+    (tmp_path / "scripts/chapters.json").write_text(
+        json.dumps({"ch01-agent-harness": {"title": "智能体实验 🐳"}}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    entries[0]["title"] = "智能体实验 🐳"
+    (tmp_path / "notebooks/catalog.json").write_text(
+        json.dumps({"schema_version": 1, "notebooks": entries}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    env = dict(os.environ, PYTHONUTF8="0", PYTHONCOERCECLOCALE="0",
+               LC_ALL="C", PYTHONIOENCODING="utf-8")
+    command = [sys.executable, "-X", "utf8=0", "-m", "course_notebooks.run", "ok"]
+    result = subprocess.run(
+        command + (["--write-back"] if export else ["--check-only"]),
+        cwd=tmp_path, env=env, capture_output=True, text=True, encoding="utf-8", timeout=90,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    if export:
+        for directory, stem in ((tmp_path / "artifacts/notebooks", "ok"),
+                                (tmp_path / "notebooks/ch01", "ok")):
+            for suffix in (".html", ".md"):
+                assert "研究完成 🐳" in (directory / f"{stem}{suffix}").read_text(encoding="utf-8")
+        checked = subprocess.run(
+            command + ["--check-reading"], cwd=tmp_path, env=env,
+            capture_output=True, text=True, encoding="utf-8", timeout=90,
+        )
+        assert checked.returncode == 0, checked.stdout + checked.stderr
 
 
 def test_project_kernel_ignores_user_kernel_and_offline_keys(tmp_path, monkeypatch):
@@ -69,7 +103,77 @@ def test_export_keeps_filename_label_when_resolving_relative_link(tmp_path):
     output = tmp_path / "output"
     output.mkdir()
     export_reading(nb, path, tmp_path, output, "ok", "test-commit")
-    assert "[local_server.py](https://github.com/" in (output / "ok.md").read_text()
+    assert "[local_server.py](https://github.com/" in (output / "ok.md").read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("text", ["line\n", "line\n\n", "line  \n    nested\t \n  \n", "line\n    "])
+def test_reading_export_is_platform_independent_without_stripping_whitespace(tmp_path, monkeypatch, text):
+    import nbconvert.utils.text
+
+    source = "value = '''first  \n    \nlast'''\nprint(value)  "
+    entries = make_repo(tmp_path, {"ok": source})
+    path = tmp_path / "notebooks" / entries[0]["path"]
+    nb = nbformat.read(path, as_version=4)
+    nb.cells.insert(0, nbformat.v4.new_markdown_cell("hard break  \nnext line"))
+    nb.cells[1].outputs = [
+        nbformat.v4.new_output("stream", name="stdout", text=text),
+        nbformat.v4.new_output("display_data", data={"text/plain": text}),
+        nbformat.v4.new_output("error", ename="Example", evalue="", traceback=[text]),
+    ]
+    nb.metadata["course_run"] = {"mode": "offline", "source_hash": source_hash(nb)}
+    exports = []
+    for index, separator in enumerate(("\n", "\r\n")):
+        # Exercise the real nbconvert filter on both host line-separator settings.
+        monkeypatch.setattr(nbconvert.utils.text.os, "linesep", separator)
+        output = tmp_path / f"output-{index}"
+        output.mkdir()
+        export_reading(nb, path, tmp_path, output, "ok", None, relative_links=True)
+        exports.append({suffix: (output / f"ok.{suffix}").read_bytes() for suffix in ("html", "md")})
+    assert exports[0] == exports[1]
+    assert all(b"\r\n" not in body for body in exports[0].values())
+    markdown = exports[0]["md"].decode("utf-8")
+    assert source in markdown
+    assert "hard break  \nnext line" in markdown
+    if text == "line  \n    nested\t \n  \n":
+        assert "    line  \n        nested\t \n      \n" in markdown
+    if text == "line\n    ":
+        assert "    line\n        \n" in markdown
+
+
+@pytest.mark.parametrize("suffix", ["md", "html"])
+@pytest.mark.parametrize("separator", [b"\n", b"\r\n"])
+def test_reading_validation_accepts_checkout_newlines_but_rejects_changed_text(tmp_path, suffix, separator):
+    entries = make_repo(tmp_path, {"ok": "print('trailing spaces')  "})
+    path = tmp_path / "notebooks" / entries[0]["path"]
+    nb = nbformat.read(path, as_version=4)
+    nb.metadata["course_run"] = {"mode": "offline", "source_hash": source_hash(nb), "status": "passed"}
+    nbformat.write(nb, path)
+    export_reading(nb, path, tmp_path, path.parent, path.stem, None, relative_links=True)
+    saved = path.with_suffix(f".{suffix}")
+    content = saved.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", separator)
+    saved.write_bytes(content)
+    validate_reading(tmp_path, entries)
+    saved.write_bytes(content + b" ")
+    with pytest.raises(ValueError, match="reading copy"):
+        validate_reading(tmp_path, entries)
+
+
+def test_reading_validation_compares_exported_images_byte_for_byte(tmp_path):
+    entries = make_repo(tmp_path, {"ok": "display(image)"})
+    path = tmp_path / "notebooks" / entries[0]["path"]
+    nb = nbformat.read(path, as_version=4)
+    png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6VvAAAAAASUVORK5CYII="
+    nb.cells[0].outputs = [nbformat.v4.new_output("display_data", data={"image/png": png})]
+    nb.metadata["course_run"] = {"mode": "offline", "source_hash": source_hash(nb), "status": "passed"}
+    nbformat.write(nb, path)
+    export_reading(nb, path, tmp_path, path.parent, path.stem, None, relative_links=True)
+    validate_reading(tmp_path, entries)
+    image = next(path.parent.glob("*.png"))
+    original = image.read_bytes()
+    assert b"\r\n" in original
+    image.write_bytes(original.replace(b"\r\n", b"\n"))
+    with pytest.raises(ValueError, match="reading copy"):
+        validate_reading(tmp_path, entries)
 
 
 def test_failed_batch_removes_previous_selected_artifacts(tmp_path):
@@ -95,11 +199,11 @@ def test_write_back_saves_reading_formats_with_executed_output_and_local_links(t
     report = run_entries(entries, tmp_path, tmp_path / "output", mode="offline", timeout=30, write_back=True)
     assert report["results"][0]["status"] == "passed"
     for suffix in (".html", ".md"):
-        reading = path.with_suffix(suffix).read_text()
+        reading = path.with_suffix(suffix).read_text(encoding="utf-8")
         assert "visible tool result" in reading
         assert "offline" in reading
-    assert "[helper](helper.py)" in path.with_suffix(".md").read_text()
-    assert 'href="helper.py"' in path.with_suffix(".html").read_text()
+    assert "[helper](helper.py)" in path.with_suffix(".md").read_text(encoding="utf-8")
+    assert 'href="helper.py"' in path.with_suffix(".html").read_text(encoding="utf-8")
     from course_notebooks.run import validate_reading
     validate_reading(tmp_path, entries)
     path.with_suffix(".md").write_text("stale reading copy")
@@ -120,4 +224,74 @@ def test_failed_write_back_preserves_source_and_reading_copies(tmp_path):
     assert report["results"][0]["status"] == "failed"
     assert path.read_bytes() == original
     for suffix in (".html", ".md"):
-        assert path.with_suffix(suffix).read_text() == "previous reading copy"
+        assert path.with_suffix(suffix).read_text(encoding="utf-8") == "previous reading copy"
+
+
+@pytest.mark.parametrize("generic", [False, True])
+def test_live_artifacts_record_the_kernel_model_without_credentials(tmp_path, monkeypatch, generic):
+    import os
+    for key in list(os.environ):
+        if key.startswith(("MODEL_", "SILICONFLOW_", "OPENAI_", "COURSE_")):
+            monkeypatch.delenv(key)
+    # Construct the real client, but do not call an external API in this regression.
+    entries = make_repo(tmp_path, {"configured": (
+        "from course_notebooks.model_config import create_model\n"
+        "from course_notebooks.nbtools import show_runtime\n"
+        "model = create_model(None)\nshow_runtime()\nprint(model.model_name)"
+    )})
+    if generic:
+        configuration = (
+            "MODEL_API_KEY=runner-secret-key\n"
+            "MODEL_BASE_URL=https://private-user:private-password@api.example.test/v1?token=url-secret-token\n"
+        )
+        provider, host = "openai-compatible", "api.example.test"
+    else:
+        configuration = "SILICONFLOW_API_KEY=runner-secret-key\n"
+        provider, host = "siliconflow", "api.siliconflow.cn"
+    (tmp_path / ".env").write_text(configuration + "MODEL_NAME=dotenv-model\n")
+    monkeypatch.setenv("MODEL_NAME", "environment-model")
+    output = tmp_path / "output"
+    report = run_entries(entries, tmp_path, output, mode="live", timeout=30)
+    result = report["results"][0]
+    assert result["status"] == "passed"
+    expected = {
+        "provider": provider, "model_name": "environment-model", "api_host": host,
+        "temperature": 0, "timeout_seconds": 60, "max_retries": 1,
+    }
+    assert result["model_configuration"] == expected
+    saved = nbformat.read(output / "configured.ipynb", as_version=4)
+    assert saved.metadata.course_run.model_configuration == expected
+    for filename in ("report.json", "configured.ipynb", "configured.md", "configured.html"):
+        text = (output / filename).read_text(encoding="utf-8")
+        assert "environment-model" in text
+        for secret in ("runner-secret-key", "private-user", "private-password", "url-secret-token"):
+            assert secret not in text
+
+
+def test_live_missing_model_fails_before_executing_cells(tmp_path, monkeypatch):
+    import os
+    for key in list(os.environ):
+        if key.startswith(("MODEL_", "SILICONFLOW_", "OPENAI_", "COURSE_")):
+            monkeypatch.delenv(key)
+    entries = make_repo(tmp_path, {"bad": "raise RuntimeError('cell must not execute')"})
+    (tmp_path / ".env").write_text("SILICONFLOW_API_KEY=runner-secret-key\n")
+    report = run_entries(entries, tmp_path, tmp_path / "output", mode="live", timeout=30)
+    assert report["results"][0]["status"] == "failed"
+    assert report["results"][0]["error"] == "ValueError"
+    saved = nbformat.read(tmp_path / "output/bad.ipynb", as_version=4)
+    assert saved.cells[0].outputs == []
+
+
+def test_credentials_in_model_metadata_withhold_artifacts_and_report_value(tmp_path, monkeypatch):
+    import os
+    for key in list(os.environ):
+        if key.startswith(("MODEL_", "SILICONFLOW_", "OPENAI_", "COURSE_")):
+            monkeypatch.delenv(key)
+    entries = make_repo(tmp_path, {"bad": "print('no model name printed')"})
+    (tmp_path / ".env").write_text("SILICONFLOW_API_KEY=runner-secret-key\nMODEL_NAME=runner-secret-key\n")
+    output = tmp_path / "output"
+    report = run_entries(entries, tmp_path, output, mode="live", timeout=30)
+    assert report["results"][0]["status"] == "failed"
+    assert "artifacts withheld" in report["results"][0]["error"]
+    assert "runner-secret-key" not in (output / "report.json").read_text(encoding="utf-8")
+    assert not (output / "bad.ipynb").exists()
