@@ -2,7 +2,7 @@
 
 > 上一章我们学习了虚拟文件系统如何管理 Agent 的上下文。本章聚焦另一个核心能力——任务规划。`write_todos` 可以帮助 Agent 拆解任务、追踪进度；从 v0.7 开始，这项能力按需启用，不再是每个 Agent 的固定配置。
 
-配套实验：[Notebook](https://github.com/datawhalechina/deepagents-in-action/blob/main/notebooks/ch04/01-task-planning.ipynb) · [带输出的 Markdown](https://github.com/datawhalechina/deepagents-in-action/blob/main/notebooks/ch04/01-task-planning.md) · [HTML](https://github.com/datawhalechina/deepagents-in-action/blob/main/notebooks/ch04/01-task-planning.html)。重点观察计划、工具执行与产物核查的区别；HTML 下载后用浏览器打开。
+配套实验：[Notebook](https://github.com/datawhalechina/deepagents-in-action/blob/main/notebooks/ch04/01-task-planning.ipynb) · [带输出的 Markdown](https://github.com/datawhalechina/deepagents-in-action/blob/main/notebooks/ch04/01-task-planning.md) · [HTML](https://github.com/datawhalechina/deepagents-in-action/blob/main/notebooks/ch04/01-task-planning.html)。用完整的三框架对比案例观察需求拆解、追加需求后的计划调整与报告验收；HTML 下载后用浏览器打开。
 
 ## 为什么 Agent 需要"规划"能力？
 
