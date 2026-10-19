@@ -7803,7 +7803,7 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <blockquote>
-<p>本次执行模式：<strong>offline</strong>。源码指纹：<code>eadc9762e8a3</code>。</p>
+<p>本次执行模式：<strong>offline</strong>。源码指纹：<code>90cd1bbde016</code>。</p>
 </blockquote>
 </div>
 </div>
@@ -7815,8 +7815,8 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="%E7%AC%AC-4-%E7%AB%A0-Notebook%EF%BC%9A%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92%E4%B8%8E%E5%88%86%E8%A7%A3">第 4 章 Notebook：任务规划与分解<a class="anchor-link" href="#%E7%AC%AC-4-%E7%AB%A0-Notebook%EF%BC%9A%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92%E4%B8%8E%E5%88%86%E8%A7%A3">¶</a></h1><p>本 Notebook 配套<a href="../../content/ch04-task-planning.md">第 4 章正文</a>，围绕一个完整研究案例学习任务规划：
-<strong>比较 Deep Agents、Claude Agent SDK、Codex SDK，先交初稿，再根据追加需求补查、调整计划并交付修订报告。</strong></p>
+<h1 id="%E7%AC%AC-4-%E7%AB%A0-Notebook%EF%BC%9A%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92%E4%B8%8E%E5%88%86%E8%A7%A3">第 4 章 Notebook：任务规划与分解<a class="anchor-link" href="#%E7%AC%AC-4-%E7%AB%A0-Notebook%EF%BC%9A%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92%E4%B8%8E%E5%88%86%E8%A7%A3">¶</a></h1><p>对应课程章节 <a href="../../content/ch04-task-planning.md">第 4 章：任务规划与分解</a>，围绕一个完整研究案例学习任务规划：
+<strong>请调研Agent开发领域的三大Harness框架，比较 Deep Agents、Claude Agent SDK、Codex SDK，先交初稿，再根据追加需求补查、调整计划并交付修订报告。</strong></p>
 <p>第 2 章研究助手帮助我们观察 Todo 与文件状态。本章沿用搜索接口和术语，重点看需求如何拆成工作项、证据不足时如何推进，以及为什么完成清单不等于完成研究。
 你只需基础 Python；从第一格建立全部变量，可以独立运行。</p>
 </div>
@@ -8388,7 +8388,13 @@ live 不使用这份响应列表，由真实模型决定拆解、查询及更新
   [pending] 查阅 Codex SDK 的定位与工具能力
   [pending] 提交两维比较初稿
 工具返回： write_todos success ；ID： case-plan-initial
-工具返回： internet_search success ；ID： initial-search-0
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>工具返回： internet_search success ；ID： initial-search-0
 工具返回： internet_search success ；ID： initial-search-1
 工具返回： internet_search success ；ID： initial-search-2
 工具返回： submit_report success ；ID： case-draft
@@ -8525,13 +8531,7 @@ live 不使用这份响应列表，由真实模型决定拆解、查询及更新
   [completed] 补查 Codex SDK 的接入方式
   [completed] 提交三维修订报告
 工具返回： write_todos success ；ID： case-plan-final
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>
+
 最终修订报告：
 {
   "comparisons": {
@@ -8564,8 +8564,8 @@ live 不使用这份响应列表，由真实模型决定拆解、查询及更新
 }
 
 实际搜索：
-initial | Deep Agents overview | 结果数： 1
 initial | Claude Agent SDK overview | 结果数： 1
+initial | Deep Agents overview | 结果数： 1
 initial | Codex SDK overview | 结果数： 1
 expanded | Deep Agents integration | 结果数： 1
 expanded | Claude Agent SDK integration | 结果数： 1
@@ -8973,13 +8973,7 @@ Updated todo list to [{'content': '查阅 Deep Agents 的定位与工具能力',
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>
 对照： 全部 completed，但没有实际资料
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>产物未通过： 没有足够的实际搜索调用证据
+产物未通过： 没有足够的实际搜索调用证据
 
 对照： 全部 completed，但报告缺少新维度
 </pre>
