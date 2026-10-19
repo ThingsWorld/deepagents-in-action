@@ -1,9 +1,9 @@
-> 本次执行模式：**offline**。源码指纹：`eadc9762e8a3`。
+> 本次执行模式：**offline**。源码指纹：`90cd1bbde016`。
 
 # 第 4 章 Notebook：任务规划与分解
 
-本 Notebook 配套[第 4 章正文](../../content/ch04-task-planning.md)，围绕一个完整研究案例学习任务规划：
-**比较 Deep Agents、Claude Agent SDK、Codex SDK，先交初稿，再根据追加需求补查、调整计划并交付修订报告。**
+对应课程章节 [第 4 章：任务规划与分解](../../content/ch04-task-planning.md)，围绕一个完整研究案例学习任务规划：
+**请调研Agent开发领域的三大Harness框架，比较 Deep Agents、Claude Agent SDK、Codex SDK，先交初稿，再根据追加需求补查、调整计划并交付修订报告。**
 
 第 2 章研究助手帮助我们观察 Todo 与文件状态。本章沿用搜索接口和术语，重点看需求如何拆成工作项、证据不足时如何推进，以及为什么完成清单不等于完成研究。
 你只需基础 Python；从第一格建立全部变量，可以独立运行。
@@ -407,6 +407,8 @@ show_text("已提交的初稿：", json.dumps(first_submission["report"], ensure
       [pending] 查阅 Codex SDK 的定位与工具能力
       [pending] 提交两维比较初稿
     工具返回： write_todos success ；ID： case-plan-initial
+
+
     工具返回： internet_search success ；ID： initial-search-0
     工具返回： internet_search success ；ID： initial-search-1
     工具返回： internet_search success ；ID： initial-search-2
@@ -519,8 +521,6 @@ print("完整案例已交付：先有检查反馈，再有本轮补查与通过�
       [completed] 补查 Codex SDK 的接入方式
       [completed] 提交三维修订报告
     工具返回： write_todos success ；ID： case-plan-final
-
-
     
     最终修订报告：
     {
@@ -554,8 +554,8 @@ print("完整案例已交付：先有检查反馈，再有本轮补查与通过�
     }
     
     实际搜索：
-    initial | Deep Agents overview | 结果数： 1
     initial | Claude Agent SDK overview | 结果数： 1
+    initial | Deep Agents overview | 结果数： 1
     initial | Codex SDK overview | 结果数： 1
     expanded | Deep Agents integration | 结果数： 1
     expanded | Claude Agent SDK integration | 结果数： 1
@@ -842,8 +842,6 @@ for label, options, expected in controls:
 
     
     对照： 全部 completed，但没有实际资料
-
-
     产物未通过： 没有足够的实际搜索调用证据
     
     对照： 全部 completed，但报告缺少新维度
