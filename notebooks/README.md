@@ -131,7 +131,7 @@ uv run --project notebooks --locked python -m course_notebooks.run ch14-streamin
 | 第 1 章 | 待验证 | 2026-10-06 核对 | 普通 Agent 与 Deep Agent 的工具选择；无额外服务 |
 | 第 2 章：快速上手 | 待验证 | 2026-10-06 核对 | 正常场景用真实模型；故意制造工具错误的场景仍用脚本模型 |
 | 第 2 章：研究助手 | 待验证 | 2026-10-06 核对 | 真实模型与 Tavily 搜索；另需 `TAVILY_API_KEY`、`search` 依赖组 |
-| 第 4 章 | `Qwen/Qwen3-Coder-30B-A3B-Instruct` | 待补充最终提交版本的验证记录 | 研究案例使用真实模型与 Tavily；需 `TAVILY_API_KEY`、`search` 依赖组；机制对照始终使用本地资料 |
+| 第 4 章 | `Qwen/Qwen3-Coder-30B-A3B-Instruct` | 2026-10-22 整本 live 通过；基于 [`6a3c402`](https://github.com/datawhalechina/deepagents-in-action/commit/6a3c40228720e799d9589572fb090fd9358e48d9) 的本次修订版，[#161 评审](https://github.com/datawhalechina/deepagents-in-action/pull/161#pullrequestreview-5600023024) | 研究案例使用真实模型与 Tavily；需 `TAVILY_API_KEY`、`search` 依赖组；机制对照使用脚本模型与本地资料 |
 | 第 5 章 | 待验证 | 2026-10-06 核对 | 主、子 Agent 用真实模型；资料是本地固定样例，无搜索服务 |
 | 第 6 章 | 待验证 | 2026-10-06 核对 | 主 Agent 用真实模型；researcher 为固定回显图；需真实本地 Agent Server、`server` 依赖组 |
 | 第 7 章 | `Qwen/Qwen3-Coder-30B-A3B-Instruct` | 2026-10-06；[`ae27a77`](https://github.com/datawhalechina/deepagents-in-action/commit/ae27a77f0e9fe66d0ce81ff6a8d384075fbefb77)，[#133 评审](https://github.com/datawhalechina/deepagents-in-action/pull/133#pullrequestreview-5429855673) | 模型读取 Skill 与参考文件；缺失资源场景，无额外服务 |

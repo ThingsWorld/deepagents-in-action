@@ -7803,7 +7803,7 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <blockquote>
-<p>本次执行模式：<strong>offline</strong>。源码指纹：<code>90cd1bbde016</code>。</p>
+<p>本次执行模式：<strong>offline</strong>。源码指纹：<code>6f67d18c3ad1</code>。</p>
 </blockquote>
 </div>
 </div>
@@ -7911,7 +7911,8 @@ uv<span class="w"> </span>run<span class="w"> </span>--project<span class="w"> <
 </tbody>
 </table>
 <p>offline 不联网，框架与工具仍真实执行；固定计划和报告不证明模型具有自主规划能力。第 1 节检查配置，第 2 节起建立并运行完整研究案例。下一格打印运行模式、Python 和核心依赖版本。</p>
-<h3 id="%E7%A1%85%E6%B5%81%E7%9C%9F%E5%AE%9E%E6%A8%A1%E5%9E%8B%EF%BC%88live%EF%BC%89">硅流真实模型（live）<a class="anchor-link" href="#%E7%A1%85%E6%B5%81%E7%9C%9F%E5%AE%9E%E6%A8%A1%E5%9E%8B%EF%BC%88live%EF%BC%89">¶</a></h3><p>配置：真实模型统一在未提交的根目录 <code>.env</code> 中填写 <code>SILICONFLOW_API_KEY</code> 和完整 <code>MODEL_NAME</code>；公共入口不提供隐含模型默认值。API 地址、固定参数与报告字段见 <a href="../README.md#live-records">README 模型记录说明</a>。随附输出仍为 offline。</p>
+<h3 id="%E7%A1%85%E6%B5%81%E7%9C%9F%E5%AE%9E%E6%A8%A1%E5%9E%8B%EF%BC%88live%EF%BC%89">硅流真实模型（live）<a class="anchor-link" href="#%E7%A1%85%E6%B5%81%E7%9C%9F%E5%AE%9E%E6%A8%A1%E5%9E%8B%EF%BC%88live%EF%BC%89">¶</a></h3><p><strong>已验证</strong>：<code>Qwen/Qwen3-Coder-30B-A3B-Instruct</code>，2026-10-22 整本 live 通过。验证版本为基于 <a href="https://github.com/datawhalechina/deepagents-in-action/commit/6a3c40228720e799d9589572fb090fd9358e48d9"><code>6a3c402</code></a> 的本次修订版；此前实测与补充要求见 <a href="https://github.com/datawhalechina/deepagents-in-action/pull/161#pullrequestreview-5600023024">#161 评审</a>。</p>
+<p>配置：真实模型统一在未提交的根目录 <code>.env</code> 中填写 <code>SILICONFLOW_API_KEY</code> 和完整 <code>MODEL_NAME</code>；公共入口不提供隐含模型默认值。API 地址、固定参数与报告字段见 <a href="../README.md#live-records">README 模型记录说明</a>。随附输出仍为 offline。</p>
 <p>范围与服务：第 1 节仅检查配置，第 2～4 节的完整案例通过 <code>create_model()</code> 切换模式；第 5、7 节读取该案例结果，第 6、8 节始终使用脚本模型和本地资料。live 使用真实模型和 Tavily 搜索，另需 <code>TAVILY_API_KEY</code> 与 <code>search</code> 依赖组：</p>
 <div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--project<span class="w"> </span>notebooks<span class="w"> </span>--locked<span class="w"> </span>--extra<span class="w"> </span>search
 uv<span class="w"> </span>run<span class="w"> </span>--project<span class="w"> </span>notebooks<span class="w"> </span>--locked<span class="w"> </span>--extra<span class="w"> </span>search<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>course_notebooks.run<span class="w"> </span>ch04-task-planning<span class="w"> </span>--mode<span class="w"> </span>live
@@ -8388,13 +8389,7 @@ live 不使用这份响应列表，由真实模型决定拆解、查询及更新
   [pending] 查阅 Codex SDK 的定位与工具能力
   [pending] 提交两维比较初稿
 工具返回： write_todos success ；ID： case-plan-initial
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>工具返回： internet_search success ；ID： initial-search-0
+工具返回： internet_search success ；ID： initial-search-0
 工具返回： internet_search success ；ID： initial-search-1
 工具返回： internet_search success ；ID： initial-search-2
 工具返回： submit_report success ；ID： case-draft
@@ -8564,11 +8559,11 @@ live 不使用这份响应列表，由真实模型决定拆解、查询及更新
 }
 
 实际搜索：
-initial | Claude Agent SDK overview | 结果数： 1
 initial | Deep Agents overview | 结果数： 1
+initial | Claude Agent SDK overview | 结果数： 1
 initial | Codex SDK overview | 结果数： 1
-expanded | Deep Agents integration | 结果数： 1
 expanded | Claude Agent SDK integration | 结果数： 1
+expanded | Deep Agents integration | 结果数： 1
 expanded | Codex SDK integration | 结果数： 1
 完整案例已交付：先有检查反馈，再有本轮补查与通过的修订报告。
 </pre>
@@ -8863,6 +8858,32 @@ Updated todo list to [{'content': '查阅 Deep Agents 的定位与工具能力',
 要保留其他任务，应连同未修改项一起提交完整列表；省略任务不表示完成任务。
 </pre>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ch04-replacement-exercise">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="%E5%8A%A8%E6%89%8B%E7%BB%83%E4%B9%A0%EF%BC%9A%E5%8F%AA%E4%BF%AE%E6%94%B9-replacement">动手练习：只修改 replacement<a class="anchor-link" href="#%E5%8A%A8%E6%89%8B%E7%BB%83%E4%B9%A0%EF%BC%9A%E5%8F%AA%E4%BF%AE%E6%94%B9-replacement">¶</a></h3><ol>
+<li>先预测：将第二次写入改成下面两项后，最终清单有几项？第一次写入的第三项还会保留吗？</li>
+<li>只把上一格的 <code>replacement</code> 改成下面的值，其他代码保持原样，再运行上一格：</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="n">replacement</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"content"</span><span class="p">:</span> <span class="n">small_plan</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"content"</span><span class="p">],</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"completed"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"content"</span><span class="p">:</span> <span class="n">small_plan</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">"content"</span><span class="p">],</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"in_progress"</span><span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+<ol start="3">
+<li>观察 <code>replacement_state["todos"]</code>：逐项核对内容、状态和条数，并与预测比较。省略第三项表示它从清单中消失，不表示它已完成。</li>
+<li>将 <code>replacement</code> 恢复为原值，再运行上一格，确认最终清单只剩第二项：</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="n">replacement</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"content"</span><span class="p">:</span> <span class="n">small_plan</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">"content"</span><span class="p">],</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"in_progress"</span><span class="p">}]</span>
+</pre></div>
+<p><code>write_todos</code> 用本次提交的完整列表替换旧清单；要保留的任务必须一起提交。输出标题中的“一项”描述恢复后的默认实验。</p>
 </div>
 </div>
 </div>

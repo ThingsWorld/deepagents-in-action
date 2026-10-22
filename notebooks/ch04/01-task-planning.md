@@ -1,4 +1,4 @@
-> 本次执行模式：**offline**。源码指纹：`90cd1bbde016`。
+> 本次执行模式：**offline**。源码指纹：`6f67d18c3ad1`。
 
 # 第 4 章 Notebook：任务规划与分解
 
@@ -39,6 +39,8 @@ uv run --project notebooks --locked python -m course_notebooks.run ch04-task-pla
 offline 不联网，框架与工具仍真实执行；固定计划和报告不证明模型具有自主规划能力。第 1 节检查配置，第 2 节起建立并运行完整研究案例。下一格打印运行模式、Python 和核心依赖版本。
 
 ### 硅流真实模型（live）
+
+**已验证**：`Qwen/Qwen3-Coder-30B-A3B-Instruct`，2026-10-22 整本 live 通过。验证版本为基于 [`6a3c402`](https://github.com/datawhalechina/deepagents-in-action/commit/6a3c40228720e799d9589572fb090fd9358e48d9) 的本次修订版；此前实测与补充要求见 [#161 评审](https://github.com/datawhalechina/deepagents-in-action/pull/161#pullrequestreview-5600023024)。
 
 配置：真实模型统一在未提交的根目录 `.env` 中填写 `SILICONFLOW_API_KEY` 和完整 `MODEL_NAME`；公共入口不提供隐含模型默认值。API 地址、固定参数与报告字段见 [README 模型记录说明](../README.md#live-records)。随附输出仍为 offline。
 
@@ -407,8 +409,6 @@ show_text("已提交的初稿：", json.dumps(first_submission["report"], ensure
       [pending] 查阅 Codex SDK 的定位与工具能力
       [pending] 提交两维比较初稿
     工具返回： write_todos success ；ID： case-plan-initial
-
-
     工具返回： internet_search success ；ID： initial-search-0
     工具返回： internet_search success ；ID： initial-search-1
     工具返回： internet_search success ；ID： initial-search-2
@@ -554,11 +554,11 @@ print("完整案例已交付：先有检查反馈，再有本轮补查与通过�
     }
     
     实际搜索：
-    initial | Claude Agent SDK overview | 结果数： 1
     initial | Deep Agents overview | 结果数： 1
+    initial | Claude Agent SDK overview | 结果数： 1
     initial | Codex SDK overview | 结果数： 1
-    expanded | Deep Agents integration | 结果数： 1
     expanded | Claude Agent SDK integration | 结果数： 1
+    expanded | Deep Agents integration | 结果数： 1
     expanded | Codex SDK integration | 结果数： 1
     完整案例已交付：先有检查反馈，再有本轮补查与通过的修订报告。
 
@@ -777,6 +777,28 @@ print("要保留其他任务，应连同未修改项一起提交完整列表；�
     只提交一项后的清单：
     [{"content": "核查 Claude Agent SDK", "status": "in_progress"}]
     要保留其他任务，应连同未修改项一起提交完整列表；省略任务不表示完成任务。
+
+
+### 动手练习：只修改 replacement
+
+1. 先预测：将第二次写入改成下面两项后，最终清单有几项？第一次写入的第三项还会保留吗？
+2. 只把上一格的 `replacement` 改成下面的值，其他代码保持原样，再运行上一格：
+
+```python
+replacement = [
+    {"content": small_plan[0]["content"], "status": "completed"},
+    {"content": small_plan[1]["content"], "status": "in_progress"},
+]
+```
+
+3. 观察 `replacement_state["todos"]`：逐项核对内容、状态和条数，并与预测比较。省略第三项表示它从清单中消失，不表示它已完成。
+4. 将 `replacement` 恢复为原值，再运行上一格，确认最终清单只剩第二项：
+
+```python
+replacement = [{"content": small_plan[1]["content"], "status": "in_progress"}]
+```
+
+`write_todos` 用本次提交的完整列表替换旧清单；要保留的任务必须一起提交。输出标题中的“一项”描述恢复后的默认实验。
 
 
 ## 7. 用案例解释学习目标 4：三种状态与何时调整
