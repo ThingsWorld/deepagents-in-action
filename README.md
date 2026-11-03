@@ -16,11 +16,16 @@
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/内容协议-CC%20BY--NC--SA%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 
+<p>
+  <a href="https://trendshift.io/repositories/57851?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-57851" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/57851/monthly?language=Astro" alt="datawhalechina%2Fdeepagents-in-action | Trendshift" width="250" height="55"/></a>
+  <a href="https://trendshift.io/developers/10200?utm_source=developer-badge&amp;utm_medium=badge&amp;utm_campaign=badge-developer-10200" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/developers/10200" alt="webup | Trendshift" width="250" height="55"/></a>
+</p>
+
 作者：**[沧海九粟](https://space.bilibili.com/28357052)** · LangChain 官方认证大使 · [LCAE 认证](https://certs.langchain.com/93ab2ac4-e237-4415-bcc8-46b27741f75a)
 
 </div>
 
-基于 LangChain / LangGraph 的中文开源课程，配套 **16 章图文、视频与实验模板**。从第一个 Agent 开始，逐步掌握任务规划、文件系统、子 Agent 协作与上下文管理。
+基于 LangChain / LangGraph 的中文开源课程，配套 **17 章图文与实验模板，并持续补充视频**。从第一个 Agent 开始，逐步掌握任务规划、文件系统、子 Agent 协作与上下文管理。
 
 **从这里开始：** [环境准备](https://datawhalechina.github.io/deepagents-in-action/chapters/pre01-agentseek-create/) → [5 分钟上手](https://datawhalechina.github.io/deepagents-in-action/chapters/ch02-quickstart/) → [课程大纲](#课程大纲)
 
@@ -38,6 +43,7 @@
 | 第 13 章：`RubricMiddleware`（Beta） | 章节以 `deepagents==0.7.1` 验证 |
 | 第 14 章：Event Streaming v3 | `deepagents>=0.6` |
 | 第 15 章：Interpreters（Beta） | Python 3.11+、`langchain-quickjs>=0.2.0` |
+| 第 17 章：Decision Model Harness | Python 3.11+；以 `deepagents==0.7.23`、`langchain-typesafe[experimental]==0.0.1a3` 验证 |
 
 示例默认通过 [硅基流动](https://cloud.siliconflow.cn/i/Fq9zUwPf) 接入支持工具调用的模型，使用 `MODEL_NAME` 环境变量配置模型名。小模型可用于简单试跑；任务规划、上下文总结和多 Agent 编排需要更强的模型能力。
 
@@ -179,6 +185,10 @@ agentseek dev
 
 运行六种编排模式，观察真实调用事件。模板：[`deepagents/subagents-dynamic`](https://github.com/agentseek-ai/agentseek-templates/tree/main/templates/deepagents/subagents-dynamic)
 
+#### 第 17 章：[Decision Model Harness — 用模型路由与 Auto Mode 控制 Agent](https://datawhalechina.github.io/deepagents-in-action/chapters/ch17-decision-harness/)
+
+从运维查询、故障分析与重启授权场景出发，理解决策模型的价值与基础原理，用轻量示例说明 LangChain / Deep Agents 的模型路由与工具检查。配套实验：[`langchain/jev-harness`](https://github.com/agentseek-ai/agentseek-templates/tree/main/templates/langchain/jev-harness)
+
 后续课程内容将根据 Deep Agents 的官方能力演进持续更新。
 
 ---
@@ -188,8 +198,6 @@ agentseek dev
 **[沧海九粟](https://space.bilibili.com/28357052)** · LangChain 官方认证大使 · 《LangChain 实战》《LangGraph 实战》作者 · B 站万粉 UP 主。
 
 **专业认证：** [LangChain Certified Agent Engineer（LCAE）](https://certs.langchain.com/93ab2ac4-e237-4415-bcc8-46b27741f75a)
-
-<a href="https://trendshift.io/developers/10200?utm_source=developer-badge&utm_medium=badge&utm_campaign=badge-developer-10200" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/developers/10200" alt="webup | Trendshift" width="250" height="55"/></a>
 
 ---
 

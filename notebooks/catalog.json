@@ -42,6 +42,16 @@
       "source_issue": 123
     },
     {
+      "id": "ch04-task-planning",
+      "chapter_id": "ch04-task-planning",
+      "title": "任务规划与分解",
+      "path": "ch04/01-task-planning.ipynb",
+      "dependencies": [],
+      "model": "optional",
+      "services": [],
+      "source_issue": 122
+    },
+    {
       "id": "ch05-subagents",
       "chapter_id": "ch05-subagents",
       "title": "子 Agent 委派与上下文隔离",

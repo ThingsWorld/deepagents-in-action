@@ -506,11 +506,14 @@ agent = create_deep_agent(
 
 实际部署中，最常见的模式是两层结构：团队共享的只读 Skill 库 + 用户个人的可写 Skill 空间。
 
+下面以本地 Python 运行演示，显式创建 `InMemoryStore` 并传给 Agent。运行前需准备本章依赖及示例模型所需的 `ANTHROPIC_API_KEY`，也可以将 `model` 替换为已配置的模型。
+
 ```python
 from dataclasses import dataclass
 
 from deepagents import FilesystemPermission, create_deep_agent
 from deepagents.backends import CompositeBackend, StateBackend, StoreBackend
+from langgraph.store.memory import InMemoryStore
 
 
 @dataclass(frozen=True)
@@ -530,6 +533,8 @@ def personal_skill_namespace(rt):
     user_id = getattr(rt.context, "user_id", "local-user")
     return ("user-skills", user_id)
 
+
+store = InMemoryStore()
 
 agent = create_deep_agent(
     model="anthropic:claude-sonnet-4-6",
@@ -553,8 +558,25 @@ agent = create_deep_agent(
             mode="deny",
         ),
     ],
+    store=store,
 )
 ```
+
+沿用上面的 `agent` 和 `TenantContext`，本地调用时传入组织和用户身份：
+
+```python
+result = agent.invoke(
+    {"messages": [{"role": "user", "content": "列出可用 Skills"}]},
+    context=TenantContext(org_id="org-acme", user_id="alice"),
+)
+```
+
+`StoreBackend` 不会自动创建存储；这里的两个路由通过不同的命名空间访问同一个 `store`。本地运行时必须接入实际的 Store，否则 Agent 启动加载 Skills 时会因没有可用的 Store 而报错。新建的 `InMemoryStore` 是空的，首次运行没有可用 Skills 属于正常情况；可参照前面的只读 Skill 示例，通过 Store API 预填对应命名空间，并使用路由相对路径作为 key。
+
+需要区分运行环境：
+
+- **本地 Python 运行**：保留上面的 `store=store`。`InMemoryStore` 仅用于演示，进程退出后数据不会保留；需要持久化时应接入持久化 Store。
+- **LangSmith Deployment 托管部署**：平台会自动提供 Store，应省略 `store=store`，也不再需要创建本地的 `InMemoryStore`。这依赖平台提供的存储能力，不能仅因代码部署到了服务器就省略 Store 配置。详见 [官方后端文档](https://docs.langchain.com/oss/python/deepagents/backends)。
 
 这个配置实现了：
 
@@ -568,7 +590,7 @@ agent = create_deep_agent(
 
 ![Skills 代码执行的两种模式](../public/imgs/25-arch-skills-code-execution.png)
 
-Skills 不仅能提供文本指令，还能包含**可执行代码**。Deep Agents 支持两种代码执行模式：沙箱脚本和解释器技能。
+Skills 不仅能提供文本指令，还能结合**代码执行**能力。Deep Agents 支持两种代码执行模式：沙箱脚本和代码解释器。
 
 ### 沙箱脚本（Sandbox Scripts）
 
@@ -610,69 +632,15 @@ Search arXiv for papers matching the user's query.
 
 这种模式适合需要运行数据处理、API 调用、文件转换等任务的场景，同时保证了执行的安全隔离。
 
-### 解释器技能（Interpreter Skills）
+### 解释器与确定性代码执行（Interpreter Skills）
 
-解释器技能将 Skill 中的代码模块暴露给 Agent 的代码解释器环境。Agent 可以直接 `import` 经过测试的辅助函数，而不必每次都重新生成逻辑。
+除了通过沙箱执行外部脚本外，Deep Agents 还可以结合代码解释器中间件在内存中运行 JavaScript 代码。
 
-> 运行前提：Interpreter Skills 需要安装 QuickJS 中间件，例如 `pip install -U "deepagents[quickjs]"` 或 `uv add "deepagents[quickjs]"`。官方文档要求 `langchain-quickjs>=0.2.0` 且 Python `>=3.11`。解释器运行在 QuickJS 内存环境中，适合导入确定性的 JS/TS helper；如果需要执行 Shell、安装包或访问完整文件系统，应使用沙箱后端。解释器、PTC 与状态生命周期见[第 15 章：Interpreters](../ch15-interpreters/)。
+模型可以将循环、批量筛选和数据聚合等逻辑交给解释器 `eval` 执行。需要注意的是，`skills` 配置仅用于向 Agent 暴露 Skill 提示词与资源，不会自动向 QuickJS 解释器中导入辅助函数；`mode="call"` 下每次代码执行均使用独立的全新环境，不会保留上一次 `eval` 的变量或函数状态。若需要复用已有的业务逻辑或辅助函数，推荐通过 `ptc` 白名单将工具暴露给解释器（程序化工具调用 PTC），或使用沙箱环境运行完整脚本。
 
-要让一个 Skill 可被导入，需要三步配置：
+> 运行前提与版本说明：本节示例按 `langchain-quickjs 0.3.9` 核对。使用解释器中间件需安装 QuickJS 依赖，例如 `pip install -U "deepagents[quickjs]"` 或 `uv add "deepagents[quickjs]"`（需 Python `>=3.11`）。在早期实验版本中，曾探索过通过 `CodeInterpreterMiddleware(skills_backend=backend)` 配合 `await import("@/skills/<name>")` 直接在解释器中导入 Skill 脚本的机制；该机制自 `langchain-quickjs 0.2.0` 起已正式移除（早于 Deep Agents 0.7），QuickJS 聚焦于纯内存的轻量安全执行与程序化工具调用（PTC）。解释器中间件、PTC 与状态生命周期详见[第 15 章：Interpreters](../ch15-interpreters/)。
 
-1. 在 frontmatter 的 `metadata.entrypoint` 中指定入口文件（JS/TS）
-2. 配置 `CodeInterpreterMiddleware` 使用相同的后端
-3. Agent 在代码中通过 `await import("@/skills/<name>")` 导入
-
-目录结构示例：
-
-```
-skills/
-└── order-helpers/
-    ├── SKILL.md
-    └── scripts/
-        └── index.ts
-```
-
-`SKILL.md`：
-
-````markdown
----
-name: order-helpers
-description: Helper functions for normalizing and grouping order records.
-metadata:
-  entrypoint: scripts/index.ts
----
-
-# order-helpers
-
-Use this skill when order records need deterministic cleanup or aggregation.
-
-Import these utilities into the REPL:
-
-```typescript
-const { groupByStatus } = await import("@/skills/order-helpers");
-groupByStatus(...);
-```
-````
-
-TypeScript 模块实现：
-
-```typescript
-// skills/order-helpers/scripts/index.ts
-interface Order {
-  id: string;
-  status: string;
-}
-
-export function groupByStatus(orders: Order[]) {
-  return orders.reduce((acc, order) => {
-    acc[order.status] = acc[order.status] ?? [];
-    acc[order.status].push(order);
-    return acc;
-  }, {});
-}
-```
-
-Agent 配置：
+配置带有 QuickJS 解释器中间件的 Agent：
 
 ```python
 from deepagents import create_deep_agent
@@ -685,11 +653,11 @@ agent = create_deep_agent(
     model="anthropic:claude-sonnet-4-6",
     backend=backend,
     skills=["/skills/"],
-    middleware=[CodeInterpreterMiddleware(skills_backend=backend)],
+    middleware=[CodeInterpreterMiddleware(mode="call")],
 )
 ```
 
-解释器技能的优势在于**确定性**——经过测试的函数不会因为 LLM 重新生成而出现偏差，同时也节省了 token（Agent 只需要写一行 import 而不是几十行实现代码）。
+解释器模式的优势在于**确定性与效率**——模型将复杂的循环遍历、批量过滤与数据聚合直接交由代码解释器运行，结果确定且避免了频繁的多轮 LLM 交互，大幅节省了上下文 Token。
 
 ## Skills、Memory 与 Tools 对比
 
@@ -773,7 +741,7 @@ Agent 擅长执行清晰的步骤化指令。Skill 内容应当包含：
 3. **三种存储后端**：StateBackend（通过 files 参数注入）、StoreBackend（持久化存储）、FilesystemBackend（直接读磁盘）
 4. **子 Agent 继承规则**：General-purpose 子 Agent 自动继承主 Agent 的 Skills，自定义子 Agent 需显式配置，状态完全隔离
 5. **权限控制**：deny 模式完全禁止、interrupt 模式人工审批，适用于生产环境的安全部署
-6. **代码执行**：沙箱脚本在隔离容器中运行外部脚本，解释器技能让 Agent 直接 import 经过测试的代码模块
+6. **代码执行**：沙箱脚本在隔离容器中运行外部脚本；解释器中间件（如 QuickJS）则在内存中通过 eval 执行模型生成的循环与数据聚合，复用业务逻辑可结合 PTC 白名单或沙箱运行
 7. **Skills vs Memory vs Tools**：三者各司其职——Skills 是按需加载的领域知识，Memory 是始终生效的全局上下文，Tools 是可执行的原子操作
 
 下一章，我们将学习长期记忆——让 Agent 拥有跨对话、跨会话的持久化记忆。
